@@ -8,7 +8,7 @@ We recommend you to use [nvm](https://github.com/creationix/nvm), in order to ju
 nvm use
 ```
 
-## API
+## API login
 
 The API root is `/api/v1`. All following routes are relative to this root.
 
@@ -40,6 +40,8 @@ Authorization: Bearer <token>
 
 Any bad credential will return a 401 status.
 Any good credential will return a new token.
+
+## API reminders
 
 ### GET `/reminders`
 
@@ -140,3 +142,40 @@ This allows to delete a specific reminder.
 
 * 204 if request succeeded.
 * 404 if no reminder with this ID exists.
+
+## API notifications
+
+### POST `/notifications`
+
+Required: the header `Authorization` that identifies the user.
+
+This registers a new push notification endpoint. Returns the
+URL for this endpoint in the `Location` header.
+
+#### Input
+
+All properties must be present. There is no default value. For instance (JSON):
+```json
+{
+  "subscription": {
+    "endpoint": "...",
+    "keys": {
+      "p256dh": "<base64>",
+      "auth": "<base64>"
+    }
+  },
+  "identifier": "Chrome on Samsung G2"
+}
+```
+
+* `subscription` comes directly from browsers' [PushManager API](https://developer.mozilla.org/en-US/docs/Web/API/PushManager).
+* `identifier` is a free form string. It's intended for the end-user to distinguish between different devices/browsers.
+
+#### Output
+* 201 if request succeeded, with `location` header indicating the new resource URL.
+* 400 if some properties are missing or invalid.
+
+### GET `/notifications`, {GET,PUT,DELETE} `/notification/{id}`
+These resources behave like you would expect. Few exceptions:
+* GET don't return `auth`. This value should remain secret.
+* PUT only allows you to modify the `identifier`.
