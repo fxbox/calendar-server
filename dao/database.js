@@ -93,11 +93,11 @@ const createStatements = [`
     due INTEGER NOT NULL
   )
 `, `
-  CREATE TABLE IF NOT EXISTS notifications
+  CREATE TABLE IF NOT EXISTS subscriptions
   (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     family TEXT,
-    identifier TEXT,
+    title TEXT,
     endpoint TEXT,
     p256dh TEXT,
     auth TEXT

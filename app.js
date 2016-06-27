@@ -29,7 +29,7 @@ app.post(`${API_ROOT}/login`, login);
 app.use(jwt({ secret: 'some secret that you should configure' }));
 
 app.use(`${API_ROOT}/reminders`, require('./routes/reminders'));
-app.use(`${API_ROOT}/notifications`, require('./routes/notifications'));
+app.use(`${API_ROOT}/subscriptions`, require('./routes/subscriptions'));
 
 app.get('/', (req, res) => {
   res.send('You may want to use the API instead.');
