@@ -47,23 +47,7 @@ describe('/subscriptions', function() {
     { title: updatedSubscription.title }
   );
 
-  beforeEach(function*() {
-    yield serverManager.start();
-    const res = yield chakram.post(
-      `${config.apiRoot}/login`,
-      { user: 'family_name', password: 'password' }
-    );
-    chakram.setRequestDefaults({
-      headers: {
-        Authorization: `Bearer ${res.body.token}`
-      }
-    });
-  });
-
-  afterEach(function*() {
-    chakram.clearRequestDefaults();
-    yield serverManager.stop();
-  });
+  serverManager.inject();
 
   it('should implement basic CRUD functionality', function*() {
     const expectedLocation = `${subscriptionsUrl}/1`;

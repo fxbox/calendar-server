@@ -29,23 +29,7 @@ describe('/reminders', function() {
     due: Date.now() + 2 * 60 * 60,
   };
 
-  beforeEach(function*() {
-    yield serverManager.start();
-    const res = yield chakram.post(
-      `${config.apiRoot}/login`,
-      { user: 'family_name', password: 'password' }
-    );
-    chakram.setRequestDefaults({
-      headers: {
-        Authorization: `Bearer ${res.body.token}`
-      }
-    });
-  });
-
-  afterEach(function*() {
-    chakram.clearRequestDefaults();
-    yield serverManager.stop();
-  });
+  serverManager.inject();
 
   it('should implement basic CRUD functionality', function*() {
     const expectedLocation = `${remindersUrl}/1`;
