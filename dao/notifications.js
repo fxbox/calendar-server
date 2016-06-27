@@ -41,10 +41,28 @@ module.exports = {
   },
 
   delete(family, notificationId) {
-    debug('delete reminder #%s for family %s', notificationId, family);
+    debug('delete notification #%s for family %s', notificationId, family);
     return database.ready
       .then(db => db.run(
         'DELETE FROM notifications WHERE family = ? AND id = ?',
+        family, notificationId
+      ));
+  },
+
+  update(family, notificationId, updatedNotification) {
+    debug('update notification #%s for family %s', notificationId, family);
+    return database.ready
+      .then(db => db.run(
+        `UPDATE notifications SET
+        identifier = ?,
+        endpoint = ?,
+        p256dh = ?,
+        auth = ?
+        WHERE family = ? AND id = ?`,
+        updatedNotification.identifier,
+        updatedNotification.subscription.endpoint,
+        updatedNotification.subscription.keys.p256dh,
+        updatedNotification.subscription.keys.auth,
         family, notificationId
       ));
   },

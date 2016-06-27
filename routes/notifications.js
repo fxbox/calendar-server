@@ -44,4 +44,10 @@ router.delete('/:id', (req, res, next) => {
     .catch(next);
 });
 
+router.put('/:id', (req, res, next) => {
+  notifications.update(req.user.family, req.params.id, req.body)
+    .then(() => res.status(204).end())
+    .catch(next);
+});
+
 module.exports = router;
