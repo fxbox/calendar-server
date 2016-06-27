@@ -103,4 +103,10 @@ module.exports = {
       ))
       .then(checkUpdateDelete('updated', subscriptionId));
   },
+
+  findSubscriptionsByFamily(family) {
+    return database.ready.then(
+      db => db.all('SELECT * FROM subscriptions WHERE family = ?', family)
+    );
+  }
 };
