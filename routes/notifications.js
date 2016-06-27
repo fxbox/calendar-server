@@ -1,7 +1,22 @@
+const debug = require('debug')('calendar-server:routes/notifications');
+
 const express = require('express');
 const notifications = require('../dao/notifications');
 
 const router = express.Router();
+
+function unflattenNotificationAndHidePrivateData(item) {
+  return {
+    id: item.id,
+    identifier: item.identifier,
+    subscription: {
+      endpoint: item.endpoint,
+      keys: {
+        p256dh: item.p256dh
+      }
+    }
+  };
+}
 
 router.post('/', function(req, res, next) {
   notifications.create(req.user.family, req.body).then((id) => {
@@ -11,16 +26,17 @@ router.post('/', function(req, res, next) {
 
 router.get('/', function(req, res, next) {
   notifications.index(req.user.family).then((rows) => {
-    res.send(rows.map(item => ({
-      identifier: item.identifier,
-      subscription: {
-        endpoint: item.endpoint,
-        keys: {
-          p256dh: item.p256dh
-        }
-      }
-    })));
+    res.send(rows.map(unflattenNotificationAndHidePrivateData));
   }).catch(next);
 });
+
+router.get('/:id', (req, res, next) => {
+  notifications.show(req.user.family, req.params.id)
+    .then((notification) => {
+      debug('found notification %o', notification);
+      res.send(unflattenNotificationAndHidePrivateData(notification));
+    }).catch(next);
+});
+
 
 module.exports = router;

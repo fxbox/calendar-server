@@ -95,6 +95,7 @@ const createStatements = [`
 `, `
   CREATE TABLE IF NOT EXISTS notifications
   (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     family TEXT,
     identifier TEXT,
     endpoint TEXT,

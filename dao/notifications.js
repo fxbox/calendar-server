@@ -30,41 +30,13 @@ module.exports = {
       ));
   },
 
-  // takes a `reminder` id as parameter
-  show(family, reminderId) {
-    debug('show reminder #%s for family %s', reminderId, family);
+  show(family, notificationId) {
+    debug('show notification #%s for family %s', notificationId, family);
 
     return database.ready
       .then(db => db.get(
-        'SELECT * FROM reminders WHERE family = ? AND id = ?',
-        family, reminderId
-      ));
-  },
-
-  // takes a `reminder` id as parameter
-  delete(family, reminderId) {
-    debug('delete reminder #%s for family %s', reminderId, family);
-    return database.ready
-      .then(db => db.run(
-        'DELETE FROM reminders WHERE family = ? AND id = ?',
-        family, reminderId
-      ));
-  },
-
-  // takes a `reminder` id as parameter
-  update(family, reminderId, updatedReminder) {
-    debug('update reminder #%s for family %s', reminderId, family);
-    return database.ready
-      .then(db => db.run(
-        `UPDATE reminders SET
-        recipient = ?,
-        message = ?,
-        due = ?
-        WHERE family = ? AND id = ?`,
-        updatedReminder.recipient,
-        updatedReminder.message,
-        updatedReminder.due,
-        family, reminderId
+        'SELECT * FROM notifications WHERE family = ? AND id = ?',
+        family, notificationId
       ));
   },
 };
