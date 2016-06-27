@@ -4,11 +4,11 @@ const expect = chakram.expect;
 const serverManager = require('./server_manager');
 const config = require('./config.js');
 
-describe('/notifications', function() {
-  const notificationsUrl = `${config.apiRoot}/notifications`;
+describe('/subscriptions', function() {
+  const subscriptionsUrl = `${config.apiRoot}/subscriptions`;
 
-  const initialNotification = {
-    identifier: 'my_beautiful_notification',
+  const initialSubscription = {
+    title: 'my_beautiful_subscription',
     subscription: {
       endpoint: 'https://some.endpoint',
       keys: {
@@ -18,12 +18,13 @@ describe('/notifications', function() {
     }
   };
 
-  const expectedNotification = {
-    identifier: initialNotification.identifier,
+  const expectedSubscription = {
+    id: 1,
+    title: initialSubscription.title,
     subscription: {
-      endpoint: initialNotification.subscription.endpoint,
+      endpoint: initialSubscription.subscription.endpoint,
       keys: {
-        p256dh: initialNotification.subscription.keys.p256dh,
+        p256dh: initialSubscription.subscription.keys.p256dh,
       }
     }
   };
@@ -47,14 +48,14 @@ describe('/notifications', function() {
     return serverManager.stop();
   });
 
-  it('should add a new notification endpoint and make it visible', function() {
-    return chakram.post(notificationsUrl, initialNotification).then(res => {
+  it('should add a new subscription endpoint and make it visible', function() {
+    return chakram.post(subscriptionsUrl, initialSubscription).then(res => {
       expect(res).status(201);
-      expect(res).header('location', '/api/v1/notifications/1');
+      expect(res).header('location', '/api/v1/subscriptions/1');
 
-      return chakram.get(notificationsUrl);
+      return chakram.get(subscriptionsUrl);
     }).then(res => {
-      expect(res.body).deep.equal([expectedNotification]);
+      expect(res.body).deep.equal([expectedSubscription]);
     });
   });
 });
