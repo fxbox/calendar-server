@@ -4,6 +4,8 @@ const config = require('minimist')(
   {
     default: {
       port: 3000,
+      mqport: 4000,
+      poll: 60,
       profile: path.join(__dirname, 'profiles/development')
     }
   }

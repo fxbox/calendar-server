@@ -1,11 +1,12 @@
 const subscriptionsDao = require('../dao/subscriptions');
 const remindersDao = require('../dao/reminders');
+const config = require('../config');
 const mq = require('zmq').socket('push');
 
-const ONE_MINUTE_IN_MS = 60 * 1000;
+const DELAY = config.poll * 1000;
 
-mq.bindSync('tcp://127.0.0.1:4000');
-console.log('0mq server listening on port 4000');
+mq.bindSync(`tcp://127.0.0.1:${config.mqport}`);
+console.log(`0mq server listening on port ${config.mqport}`);
 
 setInterval(function() {
   const nowInSeconds = Math.floor(Date.now() / 1000);
@@ -27,4 +28,4 @@ setInterval(function() {
     });
 
 
-}, ONE_MINUTE_IN_MS);
+}, DELAY);

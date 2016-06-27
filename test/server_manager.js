@@ -8,14 +8,21 @@ const entryPoint = path.join(__dirname, '../app.js');
 let handler;
 
 const port = 3001;
+const mqport = 4001;
 module.exports = {
   port,
+  mqport,
   start() {
     rimraf.sync('profiles/test');
 
     handler = spawn(
       'node',
-      [ entryPoint, '--port', port, '--profile', 'profiles/test' ],
+      [ entryPoint,
+        '--port', port,
+        '--profile', 'profiles/test',
+        '--mqport', mqport,
+        '--poll', '1',
+      ],
       { stdio: 'inherit' }
     );
 
