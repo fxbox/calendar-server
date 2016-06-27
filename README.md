@@ -143,9 +143,12 @@ This allows to delete a specific reminder.
 * 204 if request succeeded.
 * 404 if no reminder with this ID exists.
 
-## API notifications
+## API subscriptions
 
-### POST `/notifications`
+This API manages registration for Push endpoints, to send notifications when
+reminders are (on the edge of being) due.
+
+### POST `/subscriptions`
 
 Required: the header `Authorization` that identifies the user.
 
@@ -164,18 +167,19 @@ All properties must be present. There is no default value. For instance (JSON):
       "auth": "<base64>"
     }
   },
-  "identifier": "Chrome on Samsung G2"
+  "title": "Chrome on Samsung G2"
 }
 ```
 
 * `subscription` comes directly from browsers' [PushManager API](https://developer.mozilla.org/en-US/docs/Web/API/PushManager).
-* `identifier` is a free form string. It's intended for the end-user to distinguish between different devices/browsers.
+* `title` is a free form string. It's intended for the end-user to distinguish between different devices/browsers.
 
 #### Output
 * 201 if request succeeded, with `location` header indicating the new resource URL.
 * 400 if some properties are missing or invalid.
 
-### GET `/notifications`, {GET,PUT,DELETE} `/notification/{id}`
+### GET `/subscriptions`, {GET,PUT,DELETE} `/subscriptions/{id}`
 These resources behave like you would expect. Few exceptions:
 * GET don't return `auth`. This value should remain secret.
-* PUT only allows you to modify the `identifier`.
+* PUT only allows you to modify the `title`.
+* DELETE removes the subscription.
