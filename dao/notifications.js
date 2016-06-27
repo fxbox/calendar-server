@@ -39,4 +39,13 @@ module.exports = {
         family, notificationId
       ));
   },
+
+  delete(family, notificationId) {
+    debug('delete reminder #%s for family %s', notificationId, family);
+    return database.ready
+      .then(db => db.run(
+        'DELETE FROM notifications WHERE family = ? AND id = ?',
+        family, notificationId
+      ));
+  },
 };

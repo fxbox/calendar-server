@@ -38,5 +38,10 @@ router.get('/:id', (req, res, next) => {
     }).catch(next);
 });
 
+router.delete('/:id', (req, res, next) => {
+  notifications.delete(req.user.family, req.params.id)
+    .then(() => res.status(204).end())
+    .catch(next);
+});
 
 module.exports = router;
