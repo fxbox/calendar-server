@@ -17,7 +17,8 @@ setInterval(function() {
         reminder => subscriptionsDao.findSubscriptionsByFamily(reminder.family)
           .then(subscriptions => {
             const promises = subscriptions.map(
-              subscription => mq.send({ reminder, subscription })
+              subscription =>
+                mq.send(JSON.stringify({ reminder, subscription }))
             );
             return Promise.all(promises);
           })
