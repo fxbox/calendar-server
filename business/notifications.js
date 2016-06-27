@@ -4,7 +4,8 @@ const mq = require('zmq').socket('push');
 
 const ONE_MINUTE_IN_MS = 60 * 1000;
 
-mq.bindSync('tcp://127.0.0.1:3000');
+mq.bindSync('tcp://127.0.0.1:4000');
+console.log('0mq server listening on port 4000');
 
 setInterval(function() {
   const nowInSeconds = Math.floor(Date.now() / 1000);
