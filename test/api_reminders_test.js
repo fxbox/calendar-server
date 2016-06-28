@@ -34,7 +34,7 @@ describe('/reminders', function() {
   it('should implement basic CRUD functionality', function*() {
     const expectedLocation = `${remindersUrl}/1`;
     const expectedReminder = Object.assign(
-      { id: 1 },
+      { id: 1, status: 'waiting to be due' },
       initialReminder
     );
     const updatedReminder = {

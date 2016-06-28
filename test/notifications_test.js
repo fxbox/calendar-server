@@ -13,7 +13,13 @@ describe('notifications', function() {
   };
 
   const expectedReminder = Object.assign(
-    { id: 1, family: 'family_name' },
+    {
+      id: 1,
+      family: 'family_name',
+      // FIXME: The status value shouldn't be sent to the message queue, as it
+      // gives an outdated information
+      status: 'waiting to be due'
+    },
     reminder
   );
 
