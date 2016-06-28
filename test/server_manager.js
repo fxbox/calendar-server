@@ -7,28 +7,30 @@ const entryPoint = path.join(__dirname, '../app.js');
 
 let handler;
 
-const port = 3001;
-const mqport = 4001;
+const httpPort = 3001;
+const mqPort = 4001;
 module.exports = {
-  port,
-  mqport,
+  httpPort,
+  mqPort,
   start() {
     rimraf.sync('profiles/test');
 
     handler = spawn(
       'node',
       [ entryPoint,
-        '--port', port,
+        '--httpPort', httpPort,
         '--profile', 'profiles/test',
-        '--mqport', mqport,
-        '--poll', '1',
+        '--mqPort', mqPort,
+        '--notificationPoll', '1',
       ],
       { stdio: 'inherit' }
     );
 
     const timeBetweenRetriesInMs = 500;
     const timeOutInMs = 5000;
-    return tcpPortUsed.waitUntilUsed(port, timeBetweenRetriesInMs, timeOutInMs);
+    return tcpPortUsed.waitUntilUsed(
+      httpPort, timeBetweenRetriesInMs, timeOutInMs
+    );
   },
 
   stop() {

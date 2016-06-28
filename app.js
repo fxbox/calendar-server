@@ -48,6 +48,6 @@ app.use((err, req, res, _next) => {
   );
 });
 
-app.listen(config.port, () => {
-  console.log(`HTTP server listening on port ${config.port}.`);
+app.listen(config.httpPort, () => {
+  console.log(`HTTP server listening on port ${config.httpPort}.`);
 });

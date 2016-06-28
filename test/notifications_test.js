@@ -39,7 +39,7 @@ describe('notifications', function() {
   const remindersUrl = `${config.apiRoot}/reminders`;
   const subscriptionsUrl = `${config.apiRoot}/subscriptions`;
 
-  const mqSocket = `tcp://127.0.0.1:${serverManager.mqport}`;
+  const mqSocket = `tcp://127.0.0.1:${serverManager.mqPort}`;
 
   serverManager.inject();
 
@@ -63,7 +63,9 @@ describe('notifications', function() {
       })
     ).then(message => {
       message = JSON.parse(message.toString());
-      expectedReminder.created = message.reminder.created; // hack
+      // Undeterministic timestamp. Asserting against it doesn't
+      // provide any value to the test
+      delete message.reminder.created;
       expect(message).deep.equal({
         reminder: expectedReminder,
         subscription: expectedSubscription
