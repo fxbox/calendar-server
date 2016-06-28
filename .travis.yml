@@ -1,5 +1,10 @@
 language: node_js
 
+addons:
+  apt:
+    packages:
+    - libzmq3-dev
+
 script:
   - npm run lint
   - npm test
