@@ -91,7 +91,7 @@ const createStatements = [`
     message TEXT,
     created INTEGER DEFAULT (strftime('%s', 'now')), -- Needed to force integer
     due INTEGER NOT NULL,
-    status TEXT DEFAULT 'waiting to be due'
+    status TEXT DEFAULT 'waiting'
   )
 `, `
   CREATE TABLE IF NOT EXISTS subscriptions

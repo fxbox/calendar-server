@@ -115,7 +115,10 @@ module.exports = {
 
   findAllDueReminders(nowInSeconds) {
     return database.ready.then(db =>
-      db.all('SELECT * FROM reminders WHERE due > ?', nowInSeconds)
+      db.all(
+        'SELECT * FROM reminders WHERE due > ? AND status = "waiting"',
+        nowInSeconds
+      )
     );
   },
 
