@@ -26,6 +26,9 @@ setInterval(function() {
       );
 
       return Promise.all(remindersPromises);
+    }).catch(err => {
+      // Bubble up errors, otherwise they are silently dropped
+      console.error(err);
     });
 
 
