@@ -2,7 +2,8 @@ const debug = require('debug')('calendar-server:business/push_sender');
 const config = require('./config');
 const mq = require('zmq').socket('pull');
 const webpush = require('web-push');
-const dao = require('./dao/reminders');
+const daoReminders = require('./dao/reminders');
+const daoSubscriptions = require('./dao/subscriptions');
 
 if (config.gcmKey) {
   webpush.setGCMAPIKey(config.gcmKey);
@@ -17,20 +18,26 @@ mq.on('message', function(message) {
   Promise.resolve().then(() => {
     message = JSON.parse(message.toString());
     debug('Received message %o', message);
+    const subscription = message.subscription.subscription;
+
     return webpush.sendNotification(
-      message.subscription.endpoint,
+      subscription.endpoint,
       {
-        userPublicKey: message.subscription.keys.p256dh,
-        userAuth: message.subscription.keys.auth,
+        userPublicKey: subscription.keys.p256dh,
+        userAuth: subscription.keys.auth,
         payload: JSON.stringify(message.reminder),
       }
     );
   }).then(
-    () => dao.setReminderStatus(message.reminder.id, 'done')
+    () => daoReminders.setReminderStatus(message.reminder.id, 'done')
   ).catch((err) => {
-    console.error('PushSender: Could not send WebPush', err);
-    // TODO in case of 410 error, remove the subscription
-    // Downgrading status to waiting, so we'll try to send the push again
-    return dao.setReminderStatus(message.reminder.id, 'error');
+    if (err.statusCode === 410) { // subscription gone
+      const id = message.subscription.id;
+      debug(`Subscription #${id} deleted (was gone)`);
+      return daoSubscriptions.delete(message.reminder.family, id);
+    }
+
+    console.error('PushSender: Unhandled error', err);
+    return daoReminders.setReminderStatus(message.reminder.id, 'error');
   });
 });
