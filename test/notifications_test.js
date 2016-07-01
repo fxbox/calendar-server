@@ -28,7 +28,20 @@ describe('notifications', function() {
       }
     }
   };
-  const expectedSubscription = Object.assign({}, subscription.subscription);
+
+  const expectedSubscription = {
+    id: 1,
+    family: 'family_name',
+    title: subscription.title,
+    subscription: {
+      endpoint: subscription.subscription.endpoint,
+      keys: {
+        p256dh: subscription.subscription.keys.p256dh,
+        auth: subscription.subscription.keys.auth
+      },
+    },
+  };
+
 
   const inputs = [{
     recipient: 'Jane',

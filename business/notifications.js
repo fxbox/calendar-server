@@ -26,10 +26,7 @@ setInterval(function() {
           .then(subscriptions => {
             debug('Found subscriptions: %o', subscriptions);
             const promises = subscriptions.map(subscription => {
-              const message = {
-                reminder,
-                subscription: subscription.subscription
-              };
+              const message = { reminder, subscription };
               return mq.send(JSON.stringify(message));
             });
             return Promise.all(promises);
@@ -42,6 +39,4 @@ setInterval(function() {
       // Bubble up errors, otherwise they are silently dropped
       console.error(err);
     });
-
-
 }, delay);
