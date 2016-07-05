@@ -1,37 +1,28 @@
 [{
   "recipient": "Jane",
-  "message": "Pick up kids at school",
-  "due": 1467649800000
+  "message": "Pick up kids at school"
 }, {
   "recipient": "John",
-  "message": "Do laundry",
-  "due": 1467703800000
+  "message": "Do laundry"
 }, {
   "recipient": "Matthew",
-  "message": "Maw lawn",
-  "due": 1467738000000
+  "message": "Maw lawn"
 }, {
   "recipient": "Jane",
-  "message": "Buy milk and stuff",
-  "due": 1467831600000
+  "message": "Buy milk and stuff"
 }, {
   "recipient": "Jane",
-  "message": "Go to car mechanics",
-  "due": 1467878400000
+  "message": "Go to car mechanics"
 }, {
   "recipient": "Jane",
-  "message": "Pick up car",
-  "due": 1467910800000
+  "message": "Pick up car"
 }, {
   "recipient": "John",
-  "message": "Prepare kids for school trip",
-  "due": 1467961200000
+  "message": "Prepare kids for school trip"
 }, {
   "recipient": "John",
-  "message": "Pick up kids at school",
-  "due": 1467993600000
+  "message": "Pick up kids at school"
 }, {
   "recipient": "Matthew",
-  "message": "Walk out dog",
-  "due": 1468069200000
+  "message": "Walk out dog"
 }]
