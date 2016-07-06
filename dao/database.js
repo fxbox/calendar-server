@@ -115,7 +115,7 @@ function init(profileDir) {
 
   shouldMigrate().then(shouldMigrate => {
     // we don't care
-    debug('Should we migrate ? %s', shouldMigrate);
+    debug('Should we migrate ? `%s`', shouldMigrate);
     return updateVersion();
   }).then(() => {
     const promises = createStatements.map(

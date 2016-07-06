@@ -27,7 +27,7 @@ router.route('/:id')
   .get((req, res, next) => {
     subscriptions.show(req.user.family, req.params.id)
       .then((subscription) => {
-        debug('found subscription %o', subscription);
+        debug('Found subscription `%o`', subscription);
         res.send(hidePrivateData(subscription));
       }).catch(next);
   })

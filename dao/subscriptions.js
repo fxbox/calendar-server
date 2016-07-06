@@ -43,7 +43,7 @@ function unflatten(item) {
 
 module.exports = {
   index(family) {
-    debug('index family=%s', family);
+    debug('index(family=%s)', family);
     return database.ready
       .then(
         db => db.all('SELECT * FROM subscriptions WHERE family = ?', family)
@@ -51,7 +51,7 @@ module.exports = {
   },
 
   create(family, subscription) {
-    debug('create subscription %o for family %s', subscription, family);
+    debug('create(family=%s, subscription=%o)', subscription, family);
     checkPropertyType(subscription, 'subscription', 'object');
     checkPropertyType(subscription.subscription, 'keys', 'object');
 
@@ -70,7 +70,7 @@ module.exports = {
   },
 
   show(family, subscriptionId) {
-    debug('show subscription #%s for family %s', subscriptionId, family);
+    debug('show(family=%s, id=%s)', family, subscriptionId);
 
     return database.ready
       .then(db => db.get(
@@ -82,7 +82,7 @@ module.exports = {
   },
 
   delete(family, subscriptionId) {
-    debug('delete subscription #%s for family %s', subscriptionId, family);
+    debug('delete(family=%s, id=%s)', family, subscriptionId);
     return database.ready
       .then(db => db.run(
         'DELETE FROM subscriptions WHERE family = ? AND id = ?',
@@ -92,7 +92,7 @@ module.exports = {
   },
 
   update(family, subscriptionId, updatedSubscription) {
-    debug('update subscription #%s for family %s', subscriptionId, family);
+    debug('update(family=%s, id=%s)', family, subscriptionId);
     return database.ready
       .then(db => db.run(
         `UPDATE subscriptions SET
@@ -105,7 +105,7 @@ module.exports = {
   },
 
   findSubscriptionsByFamily(family) {
-    debug('findSubscriptionsByFamily(%s)', family);
+    debug('findSubscriptionsByFamily(family=%s)', family);
     return database.ready.then(
       db => db.all('SELECT * FROM subscriptions WHERE family = ?', family)
     ).then(items => items.map(unflatten));

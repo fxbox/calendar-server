@@ -34,7 +34,7 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   reminders.create(req.user.family, req.body).then((id) => {
-    debug('reminder with ID %s has been created in database', id);
+    debug('Reminder #%s has been created in database', id);
     res.status(201).location(`${req.baseUrl}/${id}`).end();
   }).catch(next);
 });
@@ -42,7 +42,7 @@ router.post('/', (req, res, next) => {
 router.route('/:id')
   .get((req, res, next) => {
     reminders.show(req.user.family, req.params.id).then((reminder) => {
-      debug('found reminder %o', reminder);
+      debug('Found reminder `%o`', reminder);
       res.send(removeFamilyProperty(reminder));
     }).catch(next);
   })

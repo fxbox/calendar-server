@@ -12,7 +12,7 @@ const secret = 'some secret that you should configure';
  * @returns {Void}
  */
 module.exports = function login(req, res, next) {
-  debug('login with credentials %o', req.body);
+  debug('login with credentials `%o`', req.body);
   const { user, password } = req.body;
 
   // Wow much secure very safe
@@ -21,7 +21,7 @@ module.exports = function login(req, res, next) {
     const token = jwt.sign({ family: user }, secret, { expiresIn: '30d' });
     res.send({ token });
   } else {
-    debug('Bad user/password specified: user=%s, password=%s', user, password);
+    debug('Bad creds specified: user=`%s`, password=`%s`', user, password);
     next(new UnauthorizedError(
       'invalid_credentials', 'Invalid credentials were specified'
     ));

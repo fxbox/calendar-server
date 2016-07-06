@@ -20,11 +20,11 @@ setInterval(function() {
 
   remindersDao.findAllDueReminders(now)
     .then(reminders => {
-      debug('Found reminders: %o', reminders);
+      debug('Found reminders: `%o`', reminders);
       const remindersPromises = reminders.map(
         reminder => subscriptionsDao.findSubscriptionsByFamily(reminder.family)
           .then(subscriptions => {
-            debug('Found subscriptions: %o', subscriptions);
+            debug('Found subscriptions: `%o`', subscriptions);
             const promises = subscriptions.map(subscription => {
               const message = { reminder, subscription };
               return mq.send(JSON.stringify(message));
