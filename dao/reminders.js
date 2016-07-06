@@ -28,6 +28,21 @@ function checkUpdateDelete(mode, id) {
   };
 }
 
+function serializeRecipients(recipients) {
+  return recipients && recipients.length > 0
+    ? recipients.join('|')
+    : '';
+}
+
+function deserializeRecipients(recipients) {
+  return recipients.split('|');
+}
+
+function deserialize(reminder) {
+  reminder.recipients = deserializeRecipients(reminder.recipients);
+  return reminder;
+}
+
 module.exports = {
   indexByStart(family, start, limit) {
     if (typeof start !== 'number') {
@@ -48,7 +63,8 @@ module.exports = {
     }
     debug('statement is %s', statement);
     return database.ready
-      .then(db => db.all(statement, ...statementArgs));
+      .then(db => db.all(statement, ...statementArgs))
+      .then(reminders => reminders.map(deserialize));
   },
 
   indexByStatus(family, status, limit) {
@@ -66,21 +82,22 @@ module.exports = {
     }
 
     return database.ready
-      .then(db => db.all(statement, ...statementArgs));
+      .then(db => db.all(statement, ...statementArgs))
+      .then(reminders => reminders.map(deserialize));
   },
 
   create(family, reminder) {
     debug('create reminder %o for family %s', reminder, family);
-    checkPropertyType(reminder, 'recipient', 'string');
+    checkPropertyType(reminder, 'recipients', 'object');
     checkPropertyType(reminder, 'message', 'string');
     checkPropertyType(reminder, 'due', 'number');
 
     return database.ready
       .then(db => db.run(
         `INSERT INTO reminders
-          (recipient, message, created, due, family)
+          (recipients, message, created, due, family)
           VALUES (?, ?, ?, ?, ?)`,
-          reminder.recipient,
+          serializeRecipients(reminder.recipients),
           reminder.message,
           Date.now(),
           reminder.due,
@@ -97,7 +114,10 @@ module.exports = {
         'SELECT * FROM reminders WHERE family = ? AND id = ?',
         family, reminderId
       ))
-      .then(row => row || Promise.reject(notFoundError(reminderId)));
+      .then(function(reminder) {
+        return reminder ? deserialize(reminder)
+          : Promise.reject(notFoundError(reminderId));
+      });
   },
 
   delete(family, reminderId) {
@@ -115,11 +135,11 @@ module.exports = {
     return database.ready
       .then(db => db.run(
         `UPDATE reminders SET
-        recipient = ?,
+        recipients = ?,
         message = ?,
         due = ?
         WHERE family = ? AND id = ?`,
-        updatedReminder.recipient,
+        serializeRecipients(updatedReminder.recipients),
         updatedReminder.message,
         updatedReminder.due,
         family, reminderId
@@ -134,7 +154,7 @@ module.exports = {
         'SELECT * FROM reminders WHERE due <= ? AND status = "waiting"',
         now
       )
-    );
+    ).then(reminders => reminders.map(deserialize));
   },
 
   setReminderStatus(id, status) {

@@ -87,7 +87,7 @@ const createStatements = [`
   (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     family TEXT,
-    recipient TEXT,
+    recipients TEXT,
     message TEXT,
     created INTEGER NOT NULL, -- in milliseconds
     due INTEGER NOT NULL, -- in milliseconds
