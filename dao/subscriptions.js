@@ -69,39 +69,39 @@ module.exports = {
       .then(result => result.lastId);
   },
 
-  show(family, subscriptionId) {
-    debug('show(family=%s, id=%s)', family, subscriptionId);
+  show(family, id) {
+    debug('show(family=%s, id=%s)', family, id);
 
     return database.ready
       .then(db => db.get(
         'SELECT * FROM subscriptions WHERE family = ? AND id = ?',
-        family, subscriptionId
+        family, id
       ))
-      .then(row => row || Promise.reject(notFoundError(subscriptionId)))
+      .then(row => row || Promise.reject(notFoundError(id)))
       .then(unflatten);
   },
 
-  delete(family, subscriptionId) {
-    debug('delete(family=%s, id=%s)', family, subscriptionId);
+  delete(family, id) {
+    debug('delete(family=%s, id=%s)', family, id);
     return database.ready
       .then(db => db.run(
         'DELETE FROM subscriptions WHERE family = ? AND id = ?',
-        family, subscriptionId
+        family, id
       ))
-      .then(checkUpdateDelete('deleted', subscriptionId));
+      .then(checkUpdateDelete('deleted', id));
   },
 
-  update(family, subscriptionId, updatedSubscription) {
-    debug('update(family=%s, id=%s)', family, subscriptionId);
+  update(family, id, updatedSubscription) {
+    debug('update(family=%s, id=%s)', family, id);
     return database.ready
       .then(db => db.run(
         `UPDATE subscriptions SET
         title = ?
         WHERE family = ? AND id = ?`,
         updatedSubscription.title,
-        family, subscriptionId
+        family, id
       ))
-      .then(checkUpdateDelete('updated', subscriptionId));
+      .then(checkUpdateDelete('updated', id));
   },
 
   findSubscriptionsByFamily(family) {

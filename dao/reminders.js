@@ -89,29 +89,29 @@ module.exports = {
       .then(result => result.lastId);
   },
 
-  show(family, reminderId) {
-    debug('show(family=%s, id=%s)', family, reminderId);
+  show(family, id) {
+    debug('show(family=%s, id=%s)', family, id);
 
     return database.ready
       .then(db => db.get(
         'SELECT * FROM reminders WHERE family = ? AND id = ?',
-        family, reminderId
+        family, id
       ))
-      .then(row => row || Promise.reject(notFoundError(reminderId)));
+      .then(row => row || Promise.reject(notFoundError(id)));
   },
 
-  delete(family, reminderId) {
-    debug('delete(family=%s, id=%s)', family, reminderId);
+  delete(family, id) {
+    debug('delete(family=%s, id=%s)', family, id);
     return database.ready
       .then(db => db.run(
         'DELETE FROM reminders WHERE family = ? AND id = ?',
-        family, reminderId
+        family, id
       ))
-      .then(checkUpdateDelete('deleted', reminderId));
+      .then(checkUpdateDelete('deleted', id));
   },
 
-  update(family, reminderId, updatedReminder) {
-    debug('update(family=%s, id=%s)', family, reminderId);
+  update(family, id, updatedReminder) {
+    debug('update(family=%s, id=%s)', family, id);
     return database.ready
       .then(db => db.run(
         `UPDATE reminders SET
@@ -122,9 +122,9 @@ module.exports = {
         updatedReminder.recipient,
         updatedReminder.message,
         updatedReminder.due,
-        family, reminderId
+        family, id
       ))
-      .then(checkUpdateDelete('updated', reminderId));
+      .then(checkUpdateDelete('updated', id));
   },
 
   findAllDueReminders(now) {
