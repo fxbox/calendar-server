@@ -72,16 +72,16 @@ module.exports = {
   create(family, reminder) {
     debug('create reminder %o for family %s', reminder, family);
     checkPropertyType(reminder, 'recipient', 'string');
-    checkPropertyType(reminder, 'message', 'string');
+    checkPropertyType(reminder, 'action', 'string');
     checkPropertyType(reminder, 'due', 'number');
 
     return database.ready
       .then(db => db.run(
         `INSERT INTO reminders
-          (recipient, message, created, due, family)
+          (recipient, action, created, due, family)
           VALUES (?, ?, ?, ?, ?)`,
           reminder.recipient,
-          reminder.message,
+          reminder.action,
           Date.now(),
           reminder.due,
           family
@@ -116,11 +116,11 @@ module.exports = {
       .then(db => db.run(
         `UPDATE reminders SET
         recipient = ?,
-        message = ?,
+        action = ?,
         due = ?
         WHERE family = ? AND id = ?`,
         updatedReminder.recipient,
-        updatedReminder.message,
+        updatedReminder.action,
         updatedReminder.due,
         family, reminderId
       ))

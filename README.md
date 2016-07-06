@@ -78,7 +78,7 @@ GET parameters:
 [{
   "id": 1,
   "recipient": "John",
-  "message": "Pick up kids at school",
+  "action": "Pick up kids at school",
   "created": 1466588359000,
   "due": 1466613000000
 }]
@@ -97,7 +97,7 @@ All properties must be present. There is no default value. For instance (JSON):
 ```json
 {
   "recipient": "John",
-  "message": "Pick up kids at school",
+  "action": "Pick up kids at school",
   "due": 1466613000000
 }
 ```
@@ -119,7 +119,7 @@ This gets the data about a specific reminder.
 {
   "id": 1,
   "recipient": "John",
-  "message": "Pick up kids at school",
+  "action": "Pick up kids at school",
   "created": 1466588359000,
   "due": 1466613000000
 }
@@ -137,7 +137,7 @@ All properties must be present. For example, if we would like to change **only**
 ```json
 [{
   "recipient": "Jane",
-  "message": "Pick up kids at school",
+  "action": "Pick up kids at school",
   "due": 1466613000000
 }]
 ```
@@ -210,4 +210,3 @@ developer console](https://code.google.com/apis/console/).
 ### Format of the payload
 
 This is the same format as [the reminder from the reminders API](#get-remindersid).
-

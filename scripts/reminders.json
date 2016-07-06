@@ -1,28 +1,28 @@
 [{
   "recipient": "Jane",
-  "message": "Pick up kids at school"
+  "action": "Pick up kids at school"
 }, {
   "recipient": "John",
-  "message": "Do laundry"
+  "action": "Do laundry"
 }, {
   "recipient": "Matthew",
-  "message": "Maw lawn"
+  "action": "Maw lawn"
 }, {
   "recipient": "Jane",
-  "message": "Buy milk and stuff"
+  "action": "Buy milk and stuff"
 }, {
   "recipient": "Jane",
-  "message": "Go to car mechanics"
+  "action": "Go to car mechanics"
 }, {
   "recipient": "Jane",
-  "message": "Pick up car"
+  "action": "Pick up car"
 }, {
   "recipient": "John",
-  "message": "Prepare kids for school trip"
+  "action": "Prepare kids for school trip"
 }, {
   "recipient": "John",
-  "message": "Pick up kids at school"
+  "action": "Pick up kids at school"
 }, {
   "recipient": "Matthew",
-  "message": "Walk out dog"
+  "action": "Walk out dog"
 }]

@@ -21,7 +21,7 @@ describe('/reminders', function() {
 
   const initialReminder = {
     recipient: 'Jane',
-    message: 'Pick up kids at school',
+    action: 'Pick up kids at school',
     due: Date.now() + 2 * 60 * 60 * 1000,
   };
 
@@ -35,7 +35,7 @@ describe('/reminders', function() {
     );
     const updatedReminder = {
       recipient: 'John',
-      message: 'Go shopping',
+      action: 'Go shopping',
       due: Date.now() + 4 * 60 * 60 * 1000,
     };
     const expectedUpdatedReminder = Object.assign(
