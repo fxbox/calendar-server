@@ -20,7 +20,7 @@ describe('/reminders', function() {
   const remindersUrl = `${config.apiRoot}/reminders`;
 
   const initialReminder = {
-    recipient: 'Jane',
+    recipients: ['Jane'],
     message: 'Pick up kids at school',
     due: Date.now() + 2 * 60 * 60 * 1000,
   };
@@ -34,7 +34,7 @@ describe('/reminders', function() {
       initialReminder
     );
     const updatedReminder = {
-      recipient: 'John',
+      recipients: ['John'],
       message: 'Go shopping',
       due: Date.now() + 4 * 60 * 60 * 1000,
     };

@@ -77,7 +77,7 @@ GET parameters:
 ```json
 [{
   "id": 1,
-  "recipient": "John",
+  "recipients": ["John"],
   "message": "Pick up kids at school",
   "created": 1466588359000,
   "due": 1466613000000
@@ -96,7 +96,7 @@ URL for this reminder in the `Location` header.
 All properties must be present. There is no default value. For instance (JSON):
 ```json
 {
-  "recipient": "John",
+  "recipients": ["John"],
   "message": "Pick up kids at school",
   "due": 1466613000000
 }
@@ -118,7 +118,7 @@ This gets the data about a specific reminder.
 ```json
 {
   "id": 1,
-  "recipient": "John",
+  "recipients": ["John"],
   "message": "Pick up kids at school",
   "created": 1466588359000,
   "due": 1466613000000
@@ -133,10 +133,10 @@ Required: the header `Authorization` that identifies the user.
 This allows to change a specific reminder.
 
 #### Input
-All properties must be present. For example, if we would like to change **only** the recipient (JSON):
+All properties must be present. For example, if we would like to change **only** the recipients (JSON):
 ```json
 [{
-  "recipient": "Jane",
+  "recipients": ["Jane"],
   "message": "Pick up kids at school",
   "due": 1466613000000
 }]
