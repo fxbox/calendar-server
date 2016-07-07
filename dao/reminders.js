@@ -86,7 +86,7 @@ module.exports = {
           reminder.due,
           family
       ))
-      .then(result => result.lastId);
+      .then(result => this.show(family, result.lastId));
   },
 
   show(family, reminderId) {
