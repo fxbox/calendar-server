@@ -58,7 +58,9 @@ describe('/reminders', function() {
       timestampBeforeCreation, timestampAfterCreation);
 
     res = yield chakram.put(expectedLocation, updatedReminder);
-    expect(res).status(204);
+    expect(res).status(200);
+    assertFullRemindersAreEqual(res.body, expectedUpdatedReminder,
+      timestampBeforeCreation, timestampAfterCreation);
 
     res = yield chakram.get(expectedLocation);
     expect(res).status(200);

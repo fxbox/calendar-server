@@ -54,8 +54,10 @@ router.route('/:id')
   })
   .put((req, res, next) => {
     reminders.update(req.user.family, req.params.id, req.body)
-      .then(() => res.status(204).end())
-      .catch(next);
+      .then((reminder) => {
+        debug('updated reminder %o', reminder);
+        res.send(removeFamilyProperty(reminder));
+      }).catch(next);
   });
 
 module.exports = router;
