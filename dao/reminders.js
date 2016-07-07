@@ -1,9 +1,7 @@
 const debug = require('debug')('calendar-server:reminders');
 
 const database = require('./database');
-const {
-  InternalError, InvalidInputError, NotFoundError
-} = require('../utils/errors');
+const { InvalidInputError, NotFoundError } = require('../utils/errors');
 const { checkPropertyType } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
@@ -11,21 +9,6 @@ function notFoundError(id) {
     'reminder_not_found',
     `The reminder with id ${id} does not exist.`
   );
-}
-
-function checkUpdateDelete(mode, id) {
-  return result => {
-    if (result.changes === 0) {
-      throw notFoundError(id);
-    }
-
-    if (result.changes > 1) {
-      throw new InternalError(
-        'database_corrupted',
-        `More than 1 reminder has been ${mode} (id=${id}).`
-      );
-    }
-  };
 }
 
 module.exports = {
@@ -86,7 +69,7 @@ module.exports = {
           reminder.due,
           family
       ))
-      .then(result => result.lastId);
+      .then(result => this.show(family, result.lastId));
   },
 
   show(family, reminderId) {
@@ -103,18 +86,17 @@ module.exports = {
   delete(family, reminderId) {
     debug('delete reminder #%s for family %s', reminderId, family);
     return database.ready
-      .then(db => db.run(
-        'DELETE FROM reminders WHERE family = ? AND id = ?',
+      .then(db => db.delete(
+        'FROM reminders WHERE family = ? AND id = ?',
         family, reminderId
-      ))
-      .then(checkUpdateDelete('deleted', reminderId));
+      ));
   },
 
   update(family, reminderId, updatedReminder) {
     debug('update reminder #%s for family %s', reminderId, family);
     return database.ready
-      .then(db => db.run(
-        `UPDATE reminders SET
+      .then(db => db.update(
+        `reminders SET
         recipient = ?,
         message = ?,
         due = ?
@@ -124,7 +106,7 @@ module.exports = {
         updatedReminder.due,
         family, reminderId
       ))
-      .then(checkUpdateDelete('updated', reminderId));
+      .then(() => this.show(family, reminderId));
   },
 
   findAllDueReminders(now) {
@@ -140,8 +122,8 @@ module.exports = {
   setReminderStatus(id, status) {
     debug('setReminderStatus(id=%d, status=%s)', id, status);
     return database.ready.then(db =>
-      db.run(
-        'UPDATE reminders SET status = ? WHERE id = ?',
+      db.update(
+        'reminders SET status = ? WHERE id = ?',
         status, id
       )
     );
@@ -151,8 +133,8 @@ module.exports = {
   setReminderStatusIfNotError(id, status) {
     debug('setReminderStatusIfNotError(id=%d, status=%s)', id, status);
     return database.ready.then(db =>
-      db.run(
-        'UPDATE reminders SET status = ? WHERE id = ? AND status != "error"',
+      db.update(
+        'reminders SET status = ? WHERE id = ? AND status != "error"',
         status, id
       )
     );

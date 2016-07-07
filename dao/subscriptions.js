@@ -1,7 +1,7 @@
 const debug = require('debug')('calendar-server:subscriptions');
 
 const database = require('./database');
-const { InternalError, NotFoundError } = require('../utils/errors');
+const { NotFoundError } = require('../utils/errors');
 const { checkPropertyType } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
@@ -9,21 +9,6 @@ function notFoundError(id) {
     'subscription_not_found',
     `The subscription with id ${id} does not exist.`
   );
-}
-
-function checkUpdateDelete(mode, id) {
-  return result => {
-    if (result.changes === 0) {
-      throw notFoundError(id);
-    }
-
-    if (result.changes > 1) {
-      throw new InternalError(
-        'database_corrupted',
-        `More than 1 reminder has been ${mode} (id=${id}).`
-      );
-    }
-  };
 }
 
 function unflatten(item) {
@@ -66,7 +51,7 @@ module.exports = {
           subscription.subscription.keys.p256dh,
           subscription.subscription.keys.auth // TODO Encrypt this value
       ))
-      .then(result => result.lastId);
+      .then(result => this.show(family, result.lastId));
   },
 
   show(family, subscriptionId) {
@@ -84,24 +69,23 @@ module.exports = {
   delete(family, subscriptionId) {
     debug('delete subscription #%s for family %s', subscriptionId, family);
     return database.ready
-      .then(db => db.run(
-        'DELETE FROM subscriptions WHERE family = ? AND id = ?',
+      .then(db => db.delete(
+        'FROM subscriptions WHERE family = ? AND id = ?',
         family, subscriptionId
-      ))
-      .then(checkUpdateDelete('deleted', subscriptionId));
+      ));
   },
 
   update(family, subscriptionId, updatedSubscription) {
     debug('update subscription #%s for family %s', subscriptionId, family);
     return database.ready
-      .then(db => db.run(
-        `UPDATE subscriptions SET
+      .then(db => db.update(
+        `subscriptions SET
         title = ?
         WHERE family = ? AND id = ?`,
         updatedSubscription.title,
         family, subscriptionId
       ))
-      .then(checkUpdateDelete('updated', subscriptionId));
+      .then(() => this.show(family, subscriptionId));
   },
 
   findSubscriptionsByFamily(family) {
