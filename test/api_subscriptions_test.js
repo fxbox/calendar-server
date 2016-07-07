@@ -62,7 +62,8 @@ describe('/subscriptions', function() {
     expect(res.body).deep.equal([expectedSubscription]);
 
     res = yield chakram.put(expectedLocation, updatedSubscription);
-    expect(res).status(204);
+    expect(res).status(200);
+    expect(res.body).deep.equal(expectedUpdatedSubscription);
 
     res = yield chakram.get(expectedLocation);
     expect(res).status(200);

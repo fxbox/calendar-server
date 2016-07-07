@@ -101,7 +101,8 @@ module.exports = {
         updatedSubscription.title,
         family, subscriptionId
       ))
-      .then(checkUpdateDelete('updated', subscriptionId));
+      .then(checkUpdateDelete('updated', subscriptionId))
+      .then(() => this.show(family, subscriptionId));
   },
 
   findSubscriptionsByFamily(family) {
