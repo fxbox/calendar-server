@@ -4,6 +4,8 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const deferred = require('../utils/deferred');
 
+const { InternalError, NotFoundError } = require('../utils/errors');
+
 const DB_VERSION = 1;
 
 let db;
@@ -43,6 +45,40 @@ function updateVersion() {
   });
 }
 
+function run(...args) {
+  return new Promise((resolve, reject) => {
+    // Cannot use arrow function because `this` is set by the caller
+    db.run(...args, function(err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve({ lastId: this.lastID, changes: this.changes });
+    });
+  });
+}
+
+function safeUpdateOrDelete(mode, ...args) {
+  args[0] = `${mode.toUpperCase()} ${args[0]}`;
+  debug('statement: `%s`', args[0]);
+
+  return run(...args).then((result) => {
+    if (result.changes === 0) {
+      throw new NotFoundError(
+        'no_row_changed',
+        `Nothing was ${mode}d in the database. Statement was: \`${args[0]}\``
+      );
+    }
+
+    if (result.changes > 1) {
+      throw new InternalError(
+        'database_corrupted',
+        `More than 1 row has been ${mode}d.`
+      );
+    }
+  });
+}
+
 const promisedDb = {
   all(...args) {
     return new Promise((resolve, reject) => {
@@ -55,18 +91,11 @@ const promisedDb = {
       });
     });
   },
+
   run(...args) {
-    return new Promise((resolve, reject) => {
-      // Cannot use arrow function because `this` is set by the caller
-      db.run(...args, function(err) {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve({ lastId: this.lastID, changes: this.changes });
-      });
-    });
+    return run(...args);
   },
+
   get(...args) {
     return new Promise((resolve, reject) => {
       db.get(...args, (err, row) => {
@@ -77,6 +106,14 @@ const promisedDb = {
         resolve(row);
       });
     });
+  },
+
+  update(...args) {
+    return safeUpdateOrDelete('update', ...args);
+  },
+
+  delete(...args) {
+    return safeUpdateOrDelete('delete', ...args);
   }
 };
 
