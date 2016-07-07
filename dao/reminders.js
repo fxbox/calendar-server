@@ -86,7 +86,7 @@ module.exports = {
           reminder.due,
           family
       ))
-      .then(result => result.lastId);
+      .then(result => this.show(family, result.lastId));
   },
 
   show(family, reminderId) {
@@ -124,7 +124,8 @@ module.exports = {
         updatedReminder.due,
         family, reminderId
       ))
-      .then(checkUpdateDelete('updated', reminderId));
+      .then(checkUpdateDelete('updated', reminderId))
+      .then(() => this.show(family, reminderId));
   },
 
   findAllDueReminders(now) {

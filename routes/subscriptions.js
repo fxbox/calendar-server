@@ -12,9 +12,12 @@ function hidePrivateData(item) {
 }
 
 router.post('/', function(req, res, next) {
-  subscriptions.create(req.user.family, req.body).then((id) => {
-    res.status(201).location(`${req.baseUrl}/${id}`).end();
-  }).catch(next);
+  subscriptions.create(req.user.family, req.body)
+    .then((subscription) => {
+      debug('created subscription %o', subscription);
+      res.status(201).location(`${req.baseUrl}/${subscription.id}`)
+        .send(hidePrivateData(subscription));
+    }).catch(next);
 });
 
 router.get('/', function(req, res, next) {
@@ -38,8 +41,10 @@ router.route('/:id')
   })
   .put((req, res, next) => {
     subscriptions.update(req.user.family, req.params.id, req.body)
-    .then(() => res.status(204).end())
-    .catch(next);
+    .then((subscription) => {
+      debug('updated subscription %o', subscription);
+      res.send(hidePrivateData(subscription));
+    }).catch(next);
   });
 
 module.exports = router;

@@ -33,9 +33,10 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-  reminders.create(req.user.family, req.body).then((id) => {
-    debug('reminder with ID %s has been created in database', id);
-    res.status(201).location(`${req.baseUrl}/${id}`).end();
+  reminders.create(req.user.family, req.body).then((reminder) => {
+    debug('created reminder %o', reminder);
+    res.status(201).location(`${req.baseUrl}/${reminder.id}`)
+      .send(removeFamilyProperty(reminder));
   }).catch(next);
 });
 
@@ -53,8 +54,10 @@ router.route('/:id')
   })
   .put((req, res, next) => {
     reminders.update(req.user.family, req.params.id, req.body)
-      .then(() => res.status(204).end())
-      .catch(next);
+      .then((reminder) => {
+        debug('updated reminder %o', reminder);
+        res.send(removeFamilyProperty(reminder));
+      }).catch(next);
   });
 
 module.exports = router;
