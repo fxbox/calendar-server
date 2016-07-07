@@ -66,7 +66,7 @@ module.exports = {
           subscription.subscription.keys.p256dh,
           subscription.subscription.keys.auth // TODO Encrypt this value
       ))
-      .then(result => result.lastId);
+      .then(result => this.show(family, result.lastId));
   },
 
   show(family, subscriptionId) {

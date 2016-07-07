@@ -55,6 +55,7 @@ describe('/subscriptions', function() {
     let res = yield chakram.post(subscriptionsUrl, initialSubscription);
     expect(res).status(201);
     expect(res).header('location', '/api/v1/subscriptions/1');
+    expect(res.body).deep.equal(expectedSubscription);
 
     res = yield chakram.get(subscriptionsUrl);
     expect(res).status(200);
