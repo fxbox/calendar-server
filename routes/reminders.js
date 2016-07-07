@@ -42,7 +42,7 @@ router.post('/', (req, res, next) => {
 router.route('/:id')
   .get((req, res, next) => {
     reminders.show(req.user.family, req.params.id).then((reminder) => {
-      debug('Found reminder `%o`', reminder);
+      debug('Found reminder %o', reminder);
       res.send(removeFamilyProperty(reminder));
     }).catch(next);
   })

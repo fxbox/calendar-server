@@ -12,7 +12,7 @@ const secret = 'some secret that you should configure';
  * @returns {Void}
  */
 module.exports = function login(req, res, next) {
-  debug('login with credentials `%o`', req.body);
+  debug('login with credentials %o', req.body);
   const { user, password } = req.body;
 
   // Wow much secure very safe

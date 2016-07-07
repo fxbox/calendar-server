@@ -17,7 +17,7 @@ mq.connect(`tcp://127.0.0.1:${config.mqPort}`);
 mq.on('message', function(message) {
   Promise.resolve().then(() => {
     message = JSON.parse(message.toString());
-    debug('Received message `%o`', message);
+    debug('Received message %o', message);
     const subscription = message.subscription.subscription;
 
     return webpush.sendNotification(

@@ -39,7 +39,7 @@ function insertReminders() {
 
   function postReminder(i) {
     const reminder = reminders[i];
-    console.log('Inserting reminder with index `%j`', reminder);
+    console.log('Inserting reminder %j', reminder);
     const options = Object.assign({}, baseOptions, { body: reminder });
     return request.post(options);
   }
