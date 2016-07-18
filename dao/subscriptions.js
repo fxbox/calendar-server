@@ -43,7 +43,7 @@ module.exports = {
   },
 
   create(family, subscription) {
-    debug('create(family=%s, subscription=%o)', subscription, family);
+    debug('create(family=%s, subscription=%o)', family, subscription);
     checkPropertyType(subscription, 'subscription', 'object');
     checkPropertyType(subscription.subscription, 'keys', 'object');
 
