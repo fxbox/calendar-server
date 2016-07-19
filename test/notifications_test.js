@@ -5,6 +5,8 @@ const mq = require('zmq').socket('pull');
 const serverManager = require('./server_manager');
 const config = require('./config.js');
 
+const { waitUntilReminderHasStatus } = require('./lib/wait');
+
 function waitForMqMessage() {
   return new Promise(resolve => {
     mq.once('message', (message) => {
@@ -18,6 +20,8 @@ function waitForMqMessage() {
 }
 
 describe('notifications', function() {
+  this.timeout(10000); // Tests are longer than the regular 2s-allowed-span.
+
   const subscription = {
     title: 'my_beautiful_subscription',
     subscription: {
@@ -81,29 +85,40 @@ describe('notifications', function() {
 
   serverManager.inject();
 
-  beforeEach(function*() {
-    mq.connect(mqSocket);
-    yield chakram.post(subscriptionsUrl, subscription);
+  it('should mark reminder as errored if no subscription exists', function*() {
+    let hasOneMessageBeenSent = false;
+    waitForMqMessage().then(() => {
+      hasOneMessageBeenSent = true;
+    });
+
+    yield chakram.post(remindersUrl, inputs[0]);
+    yield waitUntilReminderHasStatus('family_name', 1, 'error-no-subscription');
+    expect(hasOneMessageBeenSent).deep.equal(false);
   });
 
-  afterEach(function() {
-    mq.disconnect(mqSocket);
-  });
+  describe('once subscriptions are registered', function() {
+    beforeEach(function*() {
+      mq.connect(mqSocket);
+      yield chakram.post(subscriptionsUrl, subscription);
+    });
 
-  it('should not send a reminder twice to the message queue', function*() {
-    this.timeout(10000); // Test is longer than the regular 2s-allowed-span.
+    afterEach(function() {
+      mq.disconnect(mqSocket);
+    });
 
-    // We try to determine if the first reminder has been sent only once.
-    // In order to do so, we verify that this reminder is not sent a second time
-    // in the second setInterval. As our SQL queries are not ordered, it might
-    // occur that the first reminder pops up after the second one (in the second
-    // interval). Hence, the 3rd reminder is a sentinel to make sure we entered
-    // a new interval.
-    for (let i = 0; i < inputs.length; i++) {
-      yield chakram.post(remindersUrl, inputs[i]);
+    it('should not send a reminder twice to the message queue', function*() {
+      // We try to determine if the first reminder has been sent only once.
+      // In order to do so, we verify that this reminder is not sent a second
+      // time in the second setInterval. As our SQL queries are not ordered, it
+      // might occur that the first reminder pops up after the second one (in
+      // the second interval). Hence, the 3rd reminder is a sentinel to make
+      // sure we entered a new interval.
+      for (let i = 0; i < inputs.length; i++) {
+        yield chakram.post(remindersUrl, inputs[i]);
 
-      const message = yield waitForMqMessage();
-      expect(message).deep.equal(outputs[i]);
-    }
+        const message = yield waitForMqMessage();
+        expect(message).deep.equal(outputs[i]);
+      }
+    });
   });
 });
