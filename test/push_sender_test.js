@@ -1,15 +1,32 @@
 const sinon = require('sinon');
 const path = require('path');
-const mq = require('zmq').socket('push');
 
+const mq = require('zmq').socket('push');
 const mqPort = 4001;
+
 const config = require('../config.js');
 config.mqPort = mqPort;
 config.profile = path.join(__dirname, '../profiles/test');
 
+const until = require('until-promise').default;
+const dao = require('../dao/reminders');
+
+
+function waitUntilReminderHasStatus(family, id, status) {
+  const maxDurationInMs = 5000;
+  const intervalInMs = 500;
+  return until(
+    () => dao.show(family, id),
+    (reminder) => reminder.status === status,
+    { wait: intervalInMs, duration: maxDurationInMs }
+  );
+}
+
+
 describe('push notification sender', function() {
   let webpush;
   const mqUrl = `tcp://127.0.0.1:${mqPort}`;
+
 
   before(() => {
     mq.bindSync(mqUrl);
@@ -27,11 +44,21 @@ describe('push notification sender', function() {
   it('should emit push notifications on new messages', function*() {
     this.timeout(10000);
 
+    const family = 'family_name';
+    const id = 1;
     const message = {
-      reminder: 'Random data',
-      subscription: {
+      reminder: {
         id: 1,
-        family: 'family_name',
+        recipients: ['John'],
+        action: 'Pick up kids at school',
+        created: 1466588359000,
+        due: 1466613000000,
+        status: 'pending',
+        family
+      },
+      subscription: {
+        id,
+        family,
         title: 'Firefox 47 on Linux',
         subscription: {
           endpoint: 'https://an.end.point',
@@ -46,10 +73,7 @@ describe('push notification sender', function() {
 
     mq.send(JSON.stringify(message));
 
-    yield new Promise((resolve) => {
-      // TODO wait until reminder is marked as done
-      setTimeout(resolve, 2000);
-    });
+    yield waitUntilReminderHasStatus(family, id, 'done');
 
     sinon.assert.calledWith(webpush.sendNotification,
       subscription.endpoint,
