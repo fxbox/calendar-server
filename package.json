@@ -15,6 +15,7 @@
     "compression": "^1.6.2",
     "cors": "^2.7.1",
     "debug": "^2.2.0",
+    "enumify": "^1.0.4",
     "express": "^4.14.0",
     "express-jwt": "^3.4.0",
     "jsonwebtoken": "^7.0.1",

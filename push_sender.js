@@ -4,6 +4,7 @@ const debug = require('debug')('calendar-server:business/push_sender');
 const config = require('./config');
 const mq = require('zmq').socket('pull');
 const webpush = require('web-push');
+const { Status } = require('./model/reminder');
 
 require('./dao/database').init(config.profile);
 const daoReminders = require('./dao/reminders');
@@ -33,7 +34,9 @@ mq.on('message', function(message) {
       }
     );
   }).then(
-    () => daoReminders.setReminderStatusIfNotError(message.reminder.id, 'done')
+    () => daoReminders.setReminderStatusIfNotError(
+      message.reminder.id, Status.DONE
+    )
   ).catch((err) => {
     if (err.statusCode === 410) { // subscription gone
       const id = message.subscription.id;
@@ -42,6 +45,6 @@ mq.on('message', function(message) {
     }
 
     console.error('PushSender: Unhandled error', err);
-    return daoReminders.setReminderStatus(message.reminder.id, 'error');
+    return daoReminders.setReminderStatus(message.reminder.id, Status.ERROR);
   });
 });

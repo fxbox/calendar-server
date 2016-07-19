@@ -2,6 +2,7 @@ const debug = require('debug')('calendar-server:routes/reminders');
 const express = require('express');
 
 const reminders = require('../dao/reminders');
+const { Status } = require('../model/reminder');
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.get('/', (req, res, next) => {
 
   let operationPromise;
   if (Number.isNaN(start)) {
-    operationPromise = reminders.indexByStatus(family, 'waiting', limit);
+    operationPromise = reminders.indexByStatus(family, Status.WAITING, limit);
   } else {
     operationPromise = reminders.indexByStart(family, start, limit);
   }

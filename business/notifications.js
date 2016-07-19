@@ -3,16 +3,18 @@ const subscriptionsDao = require('../dao/subscriptions');
 const remindersDao = require('../dao/reminders');
 const config = require('../config');
 const mq = require('zmq').socket('push');
+const { Status } = require('../model/reminder');
 
 const delay = config.notificationPoll;
 
 function sendReminderAndUpdateDatabase(reminder, subscriptions) {
   if (subscriptions.length === 0) {
-    const statusName = 'no-subscription-to-send-to';
     debug('Family "%s" has no subscription, marking reminder #%s as "%s"',
-      reminder.family, reminder.id, statusName
+      reminder.family, reminder.id, Status.NO_SUBSCRIPTION_WHEN_DUE
     );
-    return remindersDao.setReminderStatus(reminder.id, statusName);
+    return remindersDao.setReminderStatus(
+      reminder.id, Status.NO_SUBSCRIPTION_WHEN_DUE
+    );
   }
 
   const promises = subscriptions.map(subscription => {
@@ -21,7 +23,7 @@ function sendReminderAndUpdateDatabase(reminder, subscriptions) {
   });
 
   return Promise.all(promises)
-    .then(() => remindersDao.setReminderStatus(reminder.id, 'pending'));
+    .then(() => remindersDao.setReminderStatus(reminder.id, Status.PENDING));
 }
 
 
