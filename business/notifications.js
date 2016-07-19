@@ -8,7 +8,7 @@ const delay = config.notificationPoll;
 
 function sendReminderAndUpdateDatabase(reminder, subscriptions) {
   if (subscriptions.length === 0) {
-    const statusName = 'no-subscription-to-send-to';
+    const statusName = 'error-no-subscription';
     debug('Family "%s" has no subscription, marking reminder #%s as "%s"',
       reminder.family, reminder.id, statusName
     );
