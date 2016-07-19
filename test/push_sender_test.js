@@ -45,10 +45,10 @@ describe('push notification sender', function() {
     this.timeout(10000);
 
     const family = 'family_name';
-    const id = 1;
+    const reminderId = 1;
     const message = {
       reminder: {
-        id: 1,
+        id: reminderId,
         recipients: ['John'],
         action: 'Pick up kids at school',
         created: 1466588359000,
@@ -57,7 +57,7 @@ describe('push notification sender', function() {
         family
       },
       subscription: {
-        id,
+        id: 1,
         family,
         title: 'Firefox 47 on Linux',
         subscription: {
@@ -73,7 +73,7 @@ describe('push notification sender', function() {
 
     mq.send(JSON.stringify(message));
 
-    yield waitUntilReminderHasStatus(family, id, 'done');
+    yield waitUntilReminderHasStatus(family, reminderId, 'done');
 
     sinon.assert.calledWith(webpush.sendNotification,
       subscription.endpoint,
