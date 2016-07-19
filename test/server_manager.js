@@ -9,17 +9,20 @@ let handler;
 
 const httpPort = 3001;
 const mqPort = 4001;
+const profilePath = path.join(__dirname, '../profiles/test');
+
 module.exports = {
   httpPort,
   mqPort,
+  profilePath,
   start() {
-    rimraf.sync('profiles/test');
+    rimraf.sync(profilePath);
 
     handler = spawn(
       'node',
       [ entryPoint,
         '--httpPort', httpPort,
-        '--profile', 'profiles/test',
+        '--profile', profilePath,
         '--mqPort', mqPort,
         '--notificationPoll', '1000',
       ],
