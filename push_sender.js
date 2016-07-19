@@ -4,6 +4,8 @@ const debug = require('debug')('calendar-server:business/push_sender');
 const config = require('./config');
 const mq = require('zmq').socket('pull');
 const webpush = require('web-push');
+
+require('./dao/database').init(config.profile);
 const daoReminders = require('./dao/reminders');
 const daoSubscriptions = require('./dao/subscriptions');
 
