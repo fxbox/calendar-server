@@ -4,7 +4,8 @@ const database = require('./database');
 const { InvalidInputError, NotFoundError } = require('../utils/errors');
 const {
   checkPropertyType, checkIsArray
-} = require('../utils/object_validator.js');
+} = require('../utils/object_validator');
+const { Status } = require('../model/reminder');
 
 function notFoundError(id) {
   return new NotFoundError(
@@ -58,7 +59,7 @@ module.exports = {
     debug('indexByStatus(family=%s, status=%s)', family, status);
 
     let statement = 'SELECT * FROM reminders WHERE family = ? AND status = ?';
-    const statementArgs = [ family, status ];
+    const statementArgs = [ family, status.toString() ];
     if (limit) {
       statement += ' LIMIT ?';
       statementArgs.push(limit);
@@ -139,8 +140,9 @@ module.exports = {
     debug('findAllDueReminders(now=%d)', now);
     return database.ready.then(db =>
       db.all(
-        'SELECT * FROM reminders WHERE due <= ? AND status = "waiting"',
-        now
+        'SELECT * FROM reminders WHERE due <= ? AND status = ?',
+        now,
+        Status.WAITING.toString()
       )
     ).then(reminders => reminders.map(deserialize));
   },
@@ -150,7 +152,7 @@ module.exports = {
     return database.ready.then(db =>
       db.update(
         'reminders SET status = ? WHERE id = ?',
-        status, id
+        status.toString(), id
       )
     );
   },

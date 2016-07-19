@@ -3,8 +3,29 @@ const subscriptionsDao = require('../dao/subscriptions');
 const remindersDao = require('../dao/reminders');
 const config = require('../config');
 const mq = require('zmq').socket('push');
+const { Status } = require('../model/reminder');
 
 const delay = config.notificationPoll;
+
+function sendReminderAndUpdateDatabase(reminder, subscriptions) {
+  if (subscriptions.length === 0) {
+    debug('Family "%s" has no subscription, marking reminder #%s as "%s"',
+      reminder.family, reminder.id, Status.NO_SUBSCRIPTION_WHEN_DUE
+    );
+    return remindersDao.setReminderStatus(
+      reminder.id, Status.NO_SUBSCRIPTION_WHEN_DUE
+    );
+  }
+
+  const promises = subscriptions.map(subscription => {
+    const message = { reminder, subscription };
+    return mq.send(JSON.stringify(message));
+  });
+
+  return Promise.all(promises)
+    .then(() => remindersDao.setReminderStatus(reminder.id, Status.PENDING));
+}
+
 
 mq.bindSync(`tcp://127.0.0.1:${config.mqPort}`);
 console.log(`0mq server listening on port ${config.mqPort}`);
@@ -25,15 +46,9 @@ setInterval(function() {
         reminder => subscriptionsDao.findSubscriptionsByFamily(reminder.family)
           .then(subscriptions => {
             debug('Found subscriptions: %o', subscriptions);
-            const promises = subscriptions.map(subscription => {
-              const message = { reminder, subscription };
-              return mq.send(JSON.stringify(message));
-            });
-            return Promise.all(promises);
+            return sendReminderAndUpdateDatabase(reminder, subscriptions);
           })
-          .then(() => remindersDao.setReminderStatus(reminder.id, 'pending'))
-      );
-
+        );
       return Promise.all(remindersPromises);
     }).catch(err => {
       // Bubble up errors, otherwise they are silently dropped

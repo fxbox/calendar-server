@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const deferred = require('../utils/deferred');
 
 const { InternalError, NotFoundError } = require('../utils/errors');
+const { Status } = require('../model/reminder');
 
 const DB_VERSION = 1;
 
@@ -126,7 +127,7 @@ const createStatements = [`
     action TEXT,
     created INTEGER NOT NULL, -- in milliseconds
     due INTEGER NOT NULL, -- in milliseconds
-    status TEXT DEFAULT 'waiting'
+    status TEXT DEFAULT '${Status.WAITING}'
   )
 `, `
   CREATE TABLE IF NOT EXISTS subscriptions
