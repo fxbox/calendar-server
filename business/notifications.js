@@ -6,6 +6,25 @@ const mq = require('zmq').socket('push');
 
 const delay = config.notificationPoll;
 
+function sendReminderAndUpdateDatabase(reminder, subscriptions) {
+  if (subscriptions.length === 0) {
+    const statusName = 'no-subscription-to-send-to';
+    debug('Family "%s" has no subscription, marking reminder #%s as "%s"',
+      reminder.family, reminder.id, statusName
+    );
+    return remindersDao.setReminderStatus(reminder.id, statusName);
+  }
+
+  const promises = subscriptions.map(subscription => {
+    const message = { reminder, subscription };
+    return mq.send(JSON.stringify(message));
+  });
+
+  return Promise.all(promises)
+    .then(() => remindersDao.setReminderStatus(reminder.id, 'pending'));
+}
+
+
 mq.bindSync(`tcp://127.0.0.1:${config.mqPort}`);
 console.log(`0mq server listening on port ${config.mqPort}`);
 
@@ -25,15 +44,9 @@ setInterval(function() {
         reminder => subscriptionsDao.findSubscriptionsByFamily(reminder.family)
           .then(subscriptions => {
             debug('Found subscriptions: %o', subscriptions);
-            const promises = subscriptions.map(subscription => {
-              const message = { reminder, subscription };
-              return mq.send(JSON.stringify(message));
-            });
-            return Promise.all(promises);
+            return sendReminderAndUpdateDatabase(reminder, subscriptions);
           })
-          .then(() => remindersDao.setReminderStatus(reminder.id, 'pending'))
-      );
-
+        );
       return Promise.all(remindersPromises);
     }).catch(err => {
       // Bubble up errors, otherwise they are silently dropped
