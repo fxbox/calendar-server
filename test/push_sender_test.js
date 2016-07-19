@@ -8,20 +8,7 @@ const config = require('../config.js');
 config.mqPort = mqPort;
 config.profile = path.join(__dirname, '../profiles/test');
 
-const until = require('until-promise').default;
-const dao = require('../dao/reminders');
-
-
-function waitUntilReminderHasStatus(family, id, status) {
-  const maxDurationInMs = 5000;
-  const intervalInMs = 500;
-  return until(
-    () => dao.show(family, id),
-    (reminder) => reminder.status === status,
-    { wait: intervalInMs, duration: maxDurationInMs }
-  );
-}
-
+const { waitUntilReminderHasStatus } = require('./lib/wait');
 
 describe('push notification sender', function() {
   let webpush;
