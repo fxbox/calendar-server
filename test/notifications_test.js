@@ -1,5 +1,6 @@
 const chakram = require('chakram');
 const expect = chakram.expect;
+const sinon = require('sinon');
 const mq = require('zmq').socket('pull');
 
 const serverManager = require('./server_manager');
@@ -20,7 +21,7 @@ function waitForMqMessage() {
 }
 
 describe('notifications', function() {
-  this.timeout(10000); // Tests are longer than the regular 2s-allowed-span.
+  this.timeout(10000); // Tests last longer than the regular 2s-allowed-span.
 
   const subscription = {
     title: 'my_beautiful_subscription',
@@ -85,15 +86,22 @@ describe('notifications', function() {
 
   serverManager.inject();
 
-  it('should mark reminder as errored if no subscription exists', function*() {
-    let hasOneMessageBeenSent = false;
-    waitForMqMessage().then(() => {
-      hasOneMessageBeenSent = true;
+  describe('no subscription registered', function() {
+    beforeEach(function() {
+      // Start up database connection. It will be closed once the DB is deleted
+      require('../dao/database').init(serverManager.profilePath);
     });
 
-    yield chakram.post(remindersUrl, inputs[0]);
-    yield waitUntilReminderHasStatus('family_name', 1, 'error-no-subscription');
-    expect(hasOneMessageBeenSent).deep.equal(false);
+    it('marks reminder as errored', function*() {
+      const mqMessageSpy = sinon.spy();
+      waitForMqMessage().then(mqMessageSpy);
+
+      yield chakram.post(remindersUrl, inputs[0]);
+      yield waitUntilReminderHasStatus(
+        'family_name', 1, 'error-no-subscription'
+      );
+      sinon.assert.notCalled(mqMessageSpy);
+    });
   });
 
   describe('once subscriptions are registered', function() {
@@ -106,7 +114,7 @@ describe('notifications', function() {
       mq.disconnect(mqSocket);
     });
 
-    it('should not send a reminder twice to the message queue', function*() {
+    it('does not send a reminder twice to the message queue', function*() {
       // We try to determine if the first reminder has been sent only once.
       // In order to do so, we verify that this reminder is not sent a second
       // time in the second setInterval. As our SQL queries are not ordered, it
