@@ -162,12 +162,7 @@ function init(profileDir) {
 
 function close() {
   return new Promise((resolve, reject) => {
-    db.close((err) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve();
-    });
+    db.close((err) => (err ? reject(err) : resolve()));
   });
 }
 
