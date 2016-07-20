@@ -5,6 +5,7 @@ const mq = require('zmq').socket('pull');
 
 const serverManager = require('./server_manager');
 const config = require('./config.js');
+const database = require('../dao/database');
 
 const { waitUntilReminderHasStatus } = require('./lib/wait');
 
@@ -88,8 +89,11 @@ describe('notifications', function() {
 
   describe('no subscription registered', function() {
     beforeEach(function() {
-      // Start up database connection. It will be closed once the DB is deleted
-      require('../dao/database').init(serverManager.profilePath);
+      database.init(serverManager.profilePath);
+    });
+
+    afterEach(function() {
+      return database.close();
     });
 
     it('marks reminder as errored', function*() {
