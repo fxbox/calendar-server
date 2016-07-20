@@ -5,9 +5,11 @@ const config = require('./config');
 const mq = require('zmq').socket('pull');
 const webpush = require('web-push');
 
-require('./dao/database').init(config.profile);
+const database = require('./dao/database');
 const daoReminders = require('./dao/reminders');
 const daoSubscriptions = require('./dao/subscriptions');
+
+database.init(config.profile);
 
 if (config.gcmKey) {
   webpush.setGCMAPIKey(config.gcmKey);
@@ -16,7 +18,9 @@ if (config.gcmKey) {
   console.warn('  Push Notifications won\'t work in Chrome.');
 }
 
-mq.connect(`tcp://127.0.0.1:${config.mqPort}`);
+const mqUrl = `tcp://127.0.0.1:${config.mqPort}`;
+
+mq.connect(mqUrl);
 
 mq.on('message', function(message) {
   Promise.resolve().then(() => {
@@ -44,4 +48,16 @@ mq.on('message', function(message) {
     console.error('PushSender: Unhandled error', err);
     return daoReminders.setReminderStatus(message.reminder.id, 'error');
   });
+});
+
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Closing push_sender...');
+  mq.disconnect(mqUrl);
+  database.close()
+    .then(() => process.exit())
+    .catch((err) => {
+      console.error('Error while closing app: ', err);
+      process.exit(1);
+    });
 });

@@ -9,11 +9,11 @@ const jwt = require('express-jwt');
 
 const login = require('./dao/login');
 const config = require('./config');
+const database = require('./dao/database');
+const notificationsSender = require('./business/notifications');
 
-require('./dao/database').init(config.profile);
-
-// Starts up the notification polling mechanism
-require('./business/notifications');
+database.init(config.profile);
+notificationsSender.start();
 
 const app = express();
 
@@ -58,6 +58,21 @@ app.use((err, req, res, _next) => {
   res.status(err.status || 500).send(errorMessage);
 });
 
-app.listen(config.httpPort, () => {
+const server = app.listen(config.httpPort, () => {
   console.log(`HTTP server listening on port ${config.httpPort}.`);
+});
+
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Closing app...');
+
+  new Promise((resolve, reject) => {
+    server.close((err) => (err ? reject(err) : resolve()));
+  }).then(() => notificationsSender.stop())
+    .then(() => database.close())
+    .then(() => process.exit())
+    .catch((err) => {
+      console.error('Error while closing app: ', err);
+      process.exit(1);
+    });
 });
