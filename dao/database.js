@@ -142,22 +142,24 @@ const createStatements = [`
 
 function init(profileDir) {
   const dbPath = path.join(profileDir, 'reminders.db');
-  db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-      console.error('Error while opening the sqlite database', err);
-    }
-  });
 
-  shouldMigrate().then(shouldMigrate => {
-    // we don't care
-    debug('Should we migrate ? `%s`', shouldMigrate);
-    return updateVersion();
-  }).then(() => {
-    const promises = createStatements.map(
-      statement => promisedDb.run(statement)
-    );
-    return Promise.all(promises);
-  }).then(readyDeferred.resolve, readyDeferred.reject);
+  new Promise((resolve, reject) => {
+    db = new sqlite3.Database(dbPath, (err) => (err ? reject(err) : resolve()));
+  }).then(shouldMigrate)
+    .then(shouldMigrate => {
+      // we don't care
+      debug('Should we migrate ? `%s`', shouldMigrate);
+      return updateVersion();
+    }).then(() => {
+      const promises = createStatements.map(
+        statement => promisedDb.run(statement)
+      );
+      return Promise.all(promises);
+    }).then(readyDeferred.resolve, readyDeferred.reject)
+    .catch((err) => {
+      console.error(`Error while initializing the sqlite database. \
+database.ready might not be ever resolved. Error: ${err}`);
+    });
 }
 
 function close() {
