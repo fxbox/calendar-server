@@ -6,44 +6,7 @@ const deferred = require('../utils/deferred');
 
 const { InternalError, NotFoundError } = require('../utils/errors');
 
-const DB_VERSION = 1;
-
 let db;
-
-const versionCreateStatement = `
-  CREATE TABLE IF NOT EXISTS version
-  (
-    version INTEGER DEFAULT 0
-  )
-`;
-
-function shouldMigrate() {
-  return new Promise((resolve) => {
-    db.serialize(() => {
-      db.run(versionCreateStatement);
-      db.get('SELECT version FROM version', (err, row) => {
-        if (err) {
-          console.error('Error while selecting the sqlite database', err);
-          return;
-        }
-
-        let version;
-        if (row) {
-          version = row.version;
-        }
-
-        resolve(version < DB_VERSION);
-      });
-    });
-  });
-}
-
-function updateVersion() {
-  db.serialize(() => {
-    db.run('DELETE FROM version');
-    db.run('INSERT INTO version (version) VALUES (?)', DB_VERSION);
-  });
-}
 
 function run(...args) {
   return new Promise((resolve, reject) => {
@@ -151,17 +114,12 @@ function init(profileDir) {
   // please do so :)
   return new Promise((resolve, reject) => {
     db = new sqlite3.Database(dbPath, (err) => (err ? reject(err) : resolve()));
-  }).then(shouldMigrate)
-    .then(shouldMigrate => {
-      // we don't care
-      debug('Should we migrate ? `%s`', shouldMigrate);
-      return updateVersion();
-    }).then(() => {
-      const promises = createStatements.map(
-        statement => promisedDb.run(statement)
-      );
-      return Promise.all(promises);
-    }).then(readyDeferred.resolve, readyDeferred.reject)
+  }).then(() => {
+    const promises = createStatements.map(
+      statement => promisedDb.run(statement)
+    );
+    return Promise.all(promises);
+  }).then(readyDeferred.resolve, readyDeferred.reject)
     .catch((err) => {
       console.error(`Error while initializing the sqlite database. \
 database.ready might not be ever resolved. Error: ${err}`);
