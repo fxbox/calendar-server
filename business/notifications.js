@@ -4,10 +4,9 @@ const remindersDao = require('../dao/reminders');
 const config = require('../config');
 const mq = require('zmq').socket('push');
 
-const delay = config.notificationPoll;
 const mqUrl = `tcp://127.0.0.1:${config.mqPort}`;
 
-let interval;
+let intervalId;
 
 function sendReminderAndUpdateDatabase(reminder, subscriptions) {
   if (subscriptions.length === 0) {
@@ -56,16 +55,18 @@ function sendNewNotifications() {
 function start() {
   mq.bindSync(mqUrl);
   console.log(`0mq server listening on port ${config.mqPort}`);
-  interval = setInterval(sendNewNotifications, delay);
+
+  const delay = config.notificationPoll;
+  if (!intervalId) {
+    intervalId = setInterval(sendNewNotifications, delay);
+  }
 }
 
 function stop() {
-  return new Promise((resolve, reject) => {
-    if (interval) {
-      clearInterval(interval);
-    }
-    mq.unbind(mqUrl, (err) => (err ? reject(err) : resolve()));
-  });
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+  mq.unbindSync(mqUrl);
 }
 
 module.exports = { start, stop };

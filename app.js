@@ -63,8 +63,8 @@ const server = app.listen(config.httpPort, () => {
 });
 
 
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Closing app...');
+function gracefulExit() {
+  console.log('Received exit request. Closing app...');
 
   new Promise((resolve, reject) => {
     server.close((err) => (err ? reject(err) : resolve()));
@@ -75,4 +75,7 @@ process.on('SIGINT', () => {
       console.error('Error while closing app: ', err);
       process.exit(1);
     });
-});
+}
+
+process.on('SIGINT', gracefulExit);
+process.on('SIGTERM', gracefulExit);

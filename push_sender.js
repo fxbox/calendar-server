@@ -51,8 +51,8 @@ mq.on('message', function(message) {
 });
 
 
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Closing push_sender...');
+function gracefulExit() {
+  console.log('Received exit request. Closing push_sender...');
   mq.disconnect(mqUrl);
   database.close()
     .then(() => process.exit())
@@ -60,4 +60,7 @@ process.on('SIGINT', () => {
       console.error('Error while closing app: ', err);
       process.exit(1);
     });
-});
+}
+
+process.on('SIGINT', gracefulExit);
+process.on('SIGTERM', gracefulExit);
