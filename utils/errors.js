@@ -15,20 +15,20 @@ function createError(status, name) {
   return NewError;
 }
 
-const errors = {
-  InvalidInputError: createError(400, 'InvalidInputError'),
-  UnauthorizedError: createError(401, 'UnauthorizedError'),
-  NotFoundError: createError(404, 'NotFoundError'),
-  DuplicateEndpointError: createError(409, 'DuplicateEndpointError'),
-  InternalError: createError(500, 'InternalError'),
-};
+const NotFoundError = createError(404, 'NotFoundError');
 
-errors.generateNotFoundError = function(subject, discriminant) {
-  return new errors.NotFoundError(
+NotFoundError.default = function(subject, discriminant) {
+  return new NotFoundError(
     `${subject}_not_found`,
     `The ${subject} with ${discriminant.name} \`${discriminant.value}\` does \
 not exist.`
   );
 };
 
-module.exports = errors;
+module.exports = {
+  InvalidInputError: createError(400, 'InvalidInputError'),
+  UnauthorizedError: createError(401, 'UnauthorizedError'),
+  NotFoundError,
+  DuplicateEndpointError: createError(409, 'DuplicateEndpointError'),
+  InternalError: createError(500, 'InternalError'),
+};
