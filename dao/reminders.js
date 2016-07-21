@@ -1,16 +1,13 @@
 const debug = require('debug')('calendar-server:reminders');
 
 const database = require('./database');
-const { InvalidInputError, NotFoundError } = require('../utils/errors');
+const { InvalidInputError, generateNotFoundError } = require('../utils/errors');
 const {
   checkPropertyType, checkIsArray
 } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
-  return new NotFoundError(
-    'reminder_not_found',
-    `The reminder with id ${id} does not exist.`
-  );
+  return generateNotFoundError('reminder', { name: 'id', value: id });
 }
 
 function serializeRecipients(recipients) {

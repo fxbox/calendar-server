@@ -15,10 +15,20 @@ function createError(status, name) {
   return NewError;
 }
 
-module.exports = {
+const errors = {
   InvalidInputError: createError(400, 'InvalidInputError'),
   UnauthorizedError: createError(401, 'UnauthorizedError'),
   NotFoundError: createError(404, 'NotFoundError'),
   DuplicateEndpointError: createError(409, 'DuplicateEndpointError'),
   InternalError: createError(500, 'InternalError'),
 };
+
+errors.generateNotFoundError = function(subject, discriminant) {
+  return new errors.NotFoundError(
+    `${subject}_not_found`,
+    `The ${subject} with ${discriminant.name} \`${discriminant.value}\` does \
+not exist.`
+  );
+};
+
+module.exports = errors;

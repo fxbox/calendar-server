@@ -1,20 +1,16 @@
 const debug = require('debug')('calendar-server:subscriptions');
 
 const database = require('./database');
-const { NotFoundError } = require('../utils/errors');
+const { generateNotFoundError } = require('../utils/errors');
 const { checkPropertyType } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
-  return new NotFoundError(
-    'subscription_not_found',
-    `The subscription with id ${id} does not exist.`
-  );
+  return generateNotFoundError('subscription', { name: 'id', value: id });
 }
 
 function endpointNotFoundError(endpoint) {
-  return new NotFoundError(
-    'subscription_not_found',
-    `The subscription with endpoint ${endpoint} does not exist.`
+  return generateNotFoundError(
+    'subscription', { name: 'endpoint', value: endpoint }
   );
 }
 
