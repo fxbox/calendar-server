@@ -143,7 +143,13 @@ const createStatements = [`
 function init(profileDir) {
   const dbPath = path.join(profileDir, 'reminders.db');
 
-  new Promise((resolve, reject) => {
+  // Promise chain is only used in tests. The rest of the code base uses
+  // database.ready. This is due to historical reasons: we first decided to use
+  // deferred, but multiple database connection done in tests probably hide
+  // errors. That why promises are now explicitly returned.. If you are willing
+  // to change this function, and now you're reading this comment:
+  // please do so :)
+  return new Promise((resolve, reject) => {
     db = new sqlite3.Database(dbPath, (err) => (err ? reject(err) : resolve()));
   }).then(shouldMigrate)
     .then(shouldMigrate => {
@@ -159,6 +165,7 @@ function init(profileDir) {
     .catch((err) => {
       console.error(`Error while initializing the sqlite database. \
 database.ready might not be ever resolved. Error: ${err}`);
+      throw err;
     });
 }
 

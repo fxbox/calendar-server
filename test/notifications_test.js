@@ -89,7 +89,7 @@ describe('notifications', function() {
 
   describe('no subscription registered', function() {
     beforeEach(function() {
-      database.init(serverManager.profilePath);
+      return database.init(serverManager.profilePath);
     });
 
     afterEach(function() {
