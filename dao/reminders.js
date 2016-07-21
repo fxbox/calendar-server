@@ -7,7 +7,7 @@ const {
 } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
-  return NotFoundError.default('reminder', { name: 'id', value: id });
+  return NotFoundError.createWithSubject('reminder', { name: 'id', value: id });
 }
 
 function serializeRecipients(recipients) {

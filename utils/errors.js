@@ -17,7 +17,7 @@ function createError(status, name) {
 
 const NotFoundError = createError(404, 'NotFoundError');
 
-NotFoundError.default = function(subject, discriminant) {
+NotFoundError.createWithSubject = function(subject, discriminant) {
   return new NotFoundError(
     `${subject}_not_found`,
     `The ${subject} with ${discriminant.name} \`${discriminant.value}\` does \

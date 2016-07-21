@@ -5,11 +5,13 @@ const { NotFoundError } = require('../utils/errors');
 const { checkPropertyType } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
-  return NotFoundError.default('subscription', { name: 'id', value: id });
+  return NotFoundError.createWithSubject(
+    'subscription', { name: 'id', value: id }
+  );
 }
 
 function endpointNotFoundError(endpoint) {
-  return NotFoundError.default(
+  return NotFoundError.createWithSubject(
     'subscription', { name: 'endpoint', value: endpoint }
   );
 }
