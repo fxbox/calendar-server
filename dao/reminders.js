@@ -24,7 +24,7 @@ function deserialize(reminder) {
 }
 
 module.exports = {
-  indexByStart(family, start, limit) {
+  indexByStart(groupId, start, limit) {
     if (typeof start !== 'number') {
       throw new InvalidInputError('invalid_type', '"start" should be a number');
     }
@@ -33,18 +33,50 @@ module.exports = {
       throw new InvalidInputError('invalid_type', '"limit" should be a number');
     }
 
-    debug('indexByStart(family=%s, start=%s, limit=%s)', family, start, limit);
+    debug('indexByStart(groupId=%s, start=%s, limit=%s)', groupId, start, limit);
 
-    let statement = 'SELECT * FROM reminders WHERE family = ? AND due >= ?';
-    const statementArgs = [ family, start ];
+    let statement = `SELECT * FROM reminder
+        JOIN users_reminder
+            on users_reminder.reminder_id = reminder.id
+        JOIN user
+            on user.id = users_reminder.user_id
+        JOIN group_membership
+            on group_membership.user_id = user.id
+        JOIN "group"
+            on "group".id = group_membership.group_id
+        WHERE
+            "group".id = ? AND
+            reminder.due >= ?`;
+
+    const statementArgs = [ groupId, start ];
+
     if (limit) { // if limit is 0, it means no limit
       statement += ' LIMIT ?';
       statementArgs.push(limit);
     }
+
     debug('statement is `%s`', statement);
     return database.ready
       .then(db => db.all(statement, ...statementArgs))
-      .then(reminders => reminders.map(deserialize));
+      .then((reminders) => {
+        return reminders.reduce((obj, reminder) => {
+          const reminderId = reminder.reminder_id;
+
+          if (obj[reminderId]) {
+            obj[reminderId].recipients.push({ userId: reminder.user_id, forename: reminder.forename });
+          } else {
+            obj[reminderId] = {
+              action: reminder.action,
+              created: reminder.created,
+              due: reminder.due,
+              recipients: [{ userId: reminder.user_id, forename: reminder.forename }]
+            };
+          }
+          return obj;
+        }, {});
+      }).then((reminders) => {
+        return Object.keys(reminders).map((key) => Object.assign(reminders[key], { id: key }));
+      });
   },
 
   indexByStatus(family, status, limit) {
