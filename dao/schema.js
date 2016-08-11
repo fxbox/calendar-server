@@ -2,6 +2,8 @@
 // to manually cascade to reminders if there is no more recipients associated to
 // a reminder.
 const schema = `
+  PRAGMA foreign_keys = ON;
+
   CREATE TABLE IF NOT EXISTS "group" (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       name VARCHAR(128) NOT NULL
@@ -34,16 +36,16 @@ const schema = `
 
   CREATE TABLE IF NOT EXISTS users_reminder
   (
-    user_id INTEGER NOT NULL
+    user_id INTEGER NOT NULL,
+    reminder_id INTEGER NOT NULL,
+    PRIMARY KEY (user_id, reminder_id),
+    FOREIGN KEY (user_id)
       REFERENCES user(id)
-      ON UPDATE CASCADE
-      DEFERRABLE INITIALLY DEFERRED,
-    reminder_id INTEGER NOT NULL
+      ON UPDATE CASCADE,
+    FOREIGN KEY (reminder_id)
       REFERENCES reminder(id)
       ON UPDATE CASCADE
       ON DELETE CASCADE
-      DEFERRABLE INITIALLY DEFERRED,
-    PRIMARY KEY (user_id, reminder_id)
   );
 
   CREATE INDEX IF NOT EXISTS users_reminder_id
@@ -78,6 +80,11 @@ const testData = `
   VALUES
     ("Bob", "8e43ca37701228e74983efdbd0cff5c16b3b1e5d4e29a7c05626d4d25a018e11", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
 
+  INSERT INTO
+    user (forename, email_hash, password_hash)
+  VALUES
+    ("Sam", "8e43ca37701228e74983efdbd0cff5c16b3b1e5d4e29a7c05626d4d25a018e11", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+
   DELETE FROM "group";
   INSERT INTO
     "group" (name)
@@ -93,6 +100,10 @@ const testData = `
     group_membership (user_id, group_id)
   VALUES
     (2, 1);
+  INSERT INTO
+    group_membership (user_id, group_id)
+  VALUES
+    (3, 1);
 
   DELETE FROM reminder;
   INSERT INTO
