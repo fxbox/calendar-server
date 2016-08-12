@@ -40,17 +40,6 @@ function bcryptCompare(plainText, hashed) {
   });
 }
 
-/*
- { id: 2,
- forename: 'Ana',
- email: 'email@email.com',
- password_hash: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
- is_hub_user: 1,
- user_id: 1,
- group_id: 2,
- name: 'B' },
-*/
-
 // Given a raw response from a query, extract all groups found in all responses
 function extractGroups(users) {
   const _extractedGroups = users.reduce((obj, user) => {
