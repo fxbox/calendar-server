@@ -12,7 +12,6 @@ function notFoundError(id) {
 }
 
 const BCRYPT_SALT_ROUNDS = 10;
-const SHA_HASH_SALT = 'todochangeme';
 
 function bcryptHash(plainText) {
   return new Promise((resolve, reject) => {
