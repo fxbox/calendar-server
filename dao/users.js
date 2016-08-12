@@ -163,5 +163,34 @@ module.exports = {
           groups: groups
         };
       });
+  },
+  getUserByNameInGroup(name, groupId) {
+    return database.ready
+      .then((db) => {
+        return db.all(
+          `SELECT * FROM user
+        JOIN group_membership
+            on group_membership.user_id = user.id
+        JOIN "group"
+            on "group".id = group_membership.group_id
+        WHERE
+            "group".id = ? AND
+            forename = ?;
+          `,
+          groupId,
+          name
+        );
+      })
+      .then((users) => {
+        if (users.length === 0) {
+          throw notFoundError(`using email as id: ${email}`);
+        }
+
+        return {
+          userId: users[0].id,
+          forename: users[0].forename,
+          email: users[0].email
+        };
+      });
   }
 };

@@ -38,11 +38,23 @@ describe('dao:users', () => {
     });
   });
 
+  describe('getUserByNameInGroup(name, groupId)', () => {
+    it('should get the user by name in a group', () => {
+      return users.getUserByNameInGroup('Ana', 1)
+        .then((user) => {
+          expect(user).to.deep.equal({
+            forename: 'Ana',
+            email: 'email@email.com',
+            userId: 1
+          });
+        });
+    });
+  });
+
   describe('getUserFromUserId(userId)', () => {
     it('should get a user from their user id', () => {
       return users.getUserFromUserId(1)
         .then((user) => {
-          console.log(user);
           expect(user).to.deep.equal({
             forename: 'Ana',
             email: 'email@email.com',
