@@ -40,6 +40,40 @@ function bcryptCompare(plainText, hashed) {
   });
 }
 
+/*
+ { id: 2,
+ forename: 'Ana',
+ email: 'email@email.com',
+ password_hash: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+ is_hub_user: 1,
+ user_id: 1,
+ group_id: 2,
+ name: 'B' },
+*/
+
+// Given a raw response from a query, extract all groups found in all responses
+function extractGroups(users) {
+  const _extractedGroups = users.reduce((obj, user) => {
+    const groupId = user.group_id;
+
+    if (!obj[groupId]) {
+      obj[groupId] = {
+        name: user.name,
+        groupId: user.group_id
+      };
+    }
+
+    return obj;
+  }, {});
+
+  return Object.keys(_extractedGroups).map((groupId) => {
+    const group = _extractedGroups[groupId];
+
+    return group;
+  });
+}
+
+
 module.exports = {
   create(newUserObject) {
     checkPropertyType(newUserObject, 'emailAddress', 'string');
@@ -57,13 +91,14 @@ module.exports = {
             return db.run(
               `
               INSERT INTO
-                user(forename, email, password_hash)
+                user(forename, email, password_hash, is_hub_user)
               VALUES
-                (?, ?, ?)
+                (?, ?, ?, ?)
               `,
               newUserObject.forename,
               email,
-              password
+              password,
+              newUserObject.isHubUser ?  1 : 0
             );
           });
       });
@@ -87,22 +122,58 @@ module.exports = {
   getUserFromUserId(userId) {
     return database.ready
       .then((db) => {
-        return db.get(
-          'SELECT email, forename FROM user WHERE id = ?',
+        return db.all(
+          `
+          SELECT * FROM user
+          JOIN group_membership
+            on group_membership.user_id = user.id
+          JOIN "group"
+            on "group".id = group_membership.group_id
+          WHERE user.id = ?`,
           userId);
       })
-      .then((user) => {
-        user.userId = userId;
-        return user;
+      .then((users) => {
+        if (users.length === 0) {
+          throw notFoundError(userId);
+        }
+
+        const groups = extractGroups(users);
+
+        return {
+          userId: userId,
+          forename: users[0].forename,
+          email: users[0].email,
+          groups: groups
+        };
       });
   },
   getUserFromEmail(email) {
     return database.ready
       .then((db) => {
-        return db.get(
-          'SELECT email, forename, id as userId FROM user WHERE email = ?',
+        return db.all(
+          `
+          SELECT * FROM user
+          JOIN group_membership
+            on group_membership.user_id = user.id
+          JOIN "group"
+            on "group".id = group_membership.group_id
+          WHERE email = ?`,
           email
         );
+      })
+      .then((users) => {
+        if (users.length === 0) {
+          throw notFoundError(`using email as id: ${email}`);
+        }
+
+        const groups = extractGroups(users);
+
+        return {
+          userId: users[0].id,
+          forename: users[0].forename,
+          email: users[0].email,
+          groups: groups
+        };
       });
   }
 };

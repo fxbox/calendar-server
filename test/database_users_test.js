@@ -46,7 +46,11 @@ describe('dao:users', () => {
           expect(user).to.deep.equal({
             forename: 'Ana',
             email: 'email@email.com',
-            userId: 1
+            userId: 1,
+            groups: [
+              { groupId: 1, name: 'Smith' },
+              { groupId: 2, name: 'B' }
+            ]
           });
         });
     });
@@ -59,7 +63,11 @@ describe('dao:users', () => {
           expect(user).to.deep.equal({
             forename: 'Ana',
             userId: 1,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            groups: [
+              { groupId: 1, name: 'Smith' },
+              { groupId: 2, name: 'B' }
+            ]
           });
         });
     });
