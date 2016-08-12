@@ -98,7 +98,6 @@ describe('dao', () => {
           recipients: [ { userId: 1 }, { userId: 3 } ]
         }).then(() => {
           return reminders.show(1, 1).then((reminder) => {
-            console.log(reminder);
             expect(reminder.recipients).deep.equal([
               { userId: 1, forename: 'Ana' },
               { userId: 3, forename: 'Sam' }
@@ -114,7 +113,6 @@ describe('dao', () => {
         reminders.findAllDueReminders(9999999999000)
           .then((reminders) => {
             // TODO: Format response
-            console.log(reminders);
             expect(false).to.equal(true);
           });
       });

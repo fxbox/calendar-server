@@ -2,3 +2,4 @@ node_modules
 profiles
 *.log
 config/config.json
+.DS_Store
