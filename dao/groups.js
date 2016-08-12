@@ -1,10 +1,8 @@
 const debug = require('debug')('calendar-server:reminders');
 
 const database = require('./database');
-const { InvalidInputError, NotFoundError } = require('../utils/errors');
-const {
-  checkPropertyType, checkIsArray
-} = require('../utils/object_validator.js');
+const { NotFoundError } = require('../utils/errors');
+const { checkPropertyType } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
   return NotFoundError.createWithSubject('group', { name: 'id', value: id });

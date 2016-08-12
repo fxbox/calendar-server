@@ -22,7 +22,7 @@ const schema = `
   CREATE TABLE IF NOT EXISTS user (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     forename VARCHAR(128) NOT NULL,
-    email_hash VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NOT NULL,
     password_hash VARCHAR(128) NOT NULL
   );
 
@@ -71,19 +71,19 @@ const schema = `
 const testData = `
   DELETE FROM user;
   INSERT INTO
-    user (forename, email_hash, password_hash)
+    user (forename, email, password_hash)
   VALUES
-    ("Ana", "8e43ca37701228e74983efdbd0cff5c16b3b1e5d4e29a7c05626d4d25a018e11", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Ana", "email@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
 
   INSERT INTO
-    user (forename, email_hash, password_hash)
+    user (forename, email, password_hash)
   VALUES
-    ("Bob", "8e43ca37701228e74983efdbd0cff5c16b3b1e5d4e29a7c05626d4d25a018e11", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Bob", "a@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
 
   INSERT INTO
-    user (forename, email_hash, password_hash)
+    user (forename, email, password_hash)
   VALUES
-    ("Sam", "8e43ca37701228e74983efdbd0cff5c16b3b1e5d4e29a7c05626d4d25a018e11", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Sam", "b@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
 
   DELETE FROM "group";
   INSERT INTO
