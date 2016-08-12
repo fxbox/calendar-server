@@ -23,7 +23,8 @@ const schema = `
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     forename VARCHAR(128) NOT NULL,
     email VARCHAR(256) NOT NULL,
-    password_hash VARCHAR(128) NOT NULL
+    password_hash VARCHAR(128) NOT NULL,
+    is_hub_user INTEGER NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS reminder (
@@ -71,25 +72,29 @@ const schema = `
 const testData = `
   DELETE FROM user;
   INSERT INTO
-    user (forename, email, password_hash)
+    user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Ana", "email@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Ana", "email@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 1);
 
   INSERT INTO
-    user (forename, email, password_hash)
+    user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Bob", "a@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Bob", "a@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
 
   INSERT INTO
-    user (forename, email, password_hash)
+    user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Sam", "b@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+    ("Sam", "b@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
 
   DELETE FROM "group";
   INSERT INTO
     "group" (name)
   VALUES
     ("Smith");
+  INSERT INTO
+    "group" (name)
+  VALUES
+    ("B");
 
   DELETE FROM group_membership;
   INSERT INTO
@@ -104,6 +109,10 @@ const testData = `
     group_membership (user_id, group_id)
   VALUES
     (3, 1);
+  INSERT INTO
+    group_membership (user_id, group_id)
+  VALUES
+    (1, 2);
 
   DELETE FROM reminder;
   INSERT INTO

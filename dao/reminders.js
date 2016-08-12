@@ -37,6 +37,10 @@ function normalizeRecipients(reminders) {
 }
 
 module.exports = {
+
+  getRemindersForUser(userId, start, limit) {
+  },
+
   indexByStart(groupId, start, limit) {
     if (typeof start !== 'number') {
       throw new InvalidInputError('invalid_type', '"start" should be a number');
