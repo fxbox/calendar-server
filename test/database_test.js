@@ -50,7 +50,8 @@ describe('dao', () => {
     });
 
     describe('create(groupId, reminder)', () => {
-      it('should create a new reminder in the database and associate with users', () => {
+      it('should create a new reminder in the database and' +
+        ' associate with users', () => {
         return reminders.create(1, {
           recipients: [ { userId: 1 }, { userId: 2 }],
           action: 'pick up from school',
@@ -81,17 +82,19 @@ describe('dao', () => {
           .then(() => {
             return reminders.show(1, 1);
           })
-          .then((x) => {
+          .then(() => {
             throw new Error('Expected reminder to be deleted');
           })
           .catch((error) => {
-            expect(error.message).to.equal('The reminder with id `1` does not exist.');
+            expect(error.message).to.equal('The reminder with id `1` ' +
+              'does not exist.');
           });
       });
     });
 
     describe('update(groupId, id, updatedReminder', () => {
-      it('should update a reminder, removing recipients and adding recpients if necessary', () => {
+      it('should update a reminder, removing recipients and ' +
+        'adding recipients if necessary', () => {
         return reminders.update(1, 1, {
           action: 'dinner with friends',
           due: 100,
@@ -111,7 +114,7 @@ describe('dao', () => {
     describe('findAllDueReminders(now)', () => {
       it('should find all reminders due by time "now"', () => {
         reminders.findAllDueReminders(9999999999000)
-          .then((reminders) => {
+          .then(() => {
             // TODO: Format response
             expect(false).to.equal(true);
           });

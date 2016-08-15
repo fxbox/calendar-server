@@ -74,17 +74,20 @@ const testData = `
   INSERT INTO
     user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Ana", "email@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 1);
+    ("Ana", "email@email.com", 
+     "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 1);
 
   INSERT INTO
     user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Bob", "a@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
+    ("Bob", "a@email.com", 
+     "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
 
   INSERT INTO
     user (forename, email, password_hash, is_hub_user)
   VALUES
-    ("Sam", "b@email.com", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
+    ("Sam", "b@email.com", 
+     "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 0);
 
   DELETE FROM "group";
   INSERT INTO

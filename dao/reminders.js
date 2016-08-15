@@ -39,6 +39,13 @@ function normalizeRecipients(reminders) {
 module.exports = {
 
   getRemindersForUser(userId, start, limit) {
+    if (typeof start !== 'number') {
+      throw new InvalidInputError('invalid_type', '"start" should be a number');
+    }
+
+    if (typeof limit !== 'number') {
+      throw new InvalidInputError('invalid_type', '"limit" should be a number');
+    }
   },
 
   indexByStart(groupId, start, limit) {
@@ -50,7 +57,7 @@ module.exports = {
       throw new InvalidInputError('invalid_type', '"limit" should be a number');
     }
 
-    debug('indexByStart(groupId=%s, start=%s, limit=%s)', groupId, start, limit);
+    debug('indexByStart(groupId=%s,start=%s,limit=%s)', groupId, start, limit);
 
     let statement = `SELECT * FROM reminder
         JOIN users_reminder
@@ -129,26 +136,24 @@ module.exports = {
         )
         .then(result => result.lastId)
         .then((reminderId) => {
-          const insertPromises = reminder.recipients.map((recipient) => {
-            return db.run(
+          const insertPromises = reminder.recipients.map((recipient) => db.run(
               `INSERT INTO users_reminder (user_id, reminder_id)
                 VALUES (?, ?)`,
               recipient.userId,
               reminderId
-            );
-          });
+            ));
 
           // TODO: Response from this method is a little weird
           // the response is the response from the DB abotut the result
           // of the insert into the users_reminder database
           return Promise.all(insertPromises);
-        })
+        });
       });
   },
 
   show(groupId, id) {
     debug('show(groupId=%s, id=%s)', groupId, id);
-    let statement = `SELECT * FROM reminder
+    const statement = `SELECT * FROM reminder
         JOIN users_reminder
             on users_reminder.reminder_id = reminder.id
         JOIN user
@@ -210,18 +215,20 @@ module.exports = {
           const recipients = updatedReminder.recipients;
 
           // Build a WHERE clause to remove any recipients not mentioned
-          const whereClause = recipients.reduce((clause, recpient) => {
+          const whereClause = recipients.reduce((clause) => {
             if (clause.length === 0) {
               return 'users_reminder.user_id != ?';
-            } else {
-              return `${clause} AND users_reminder.user_id != ?`;
             }
+
+            return `${clause} AND users_reminder.user_id != ?`;
           }, '');
 
-          const deleteStatement = `DELETE FROM users_reminder WHERE ${whereClause}`;
+          const deleteStatement =
+            `DELETE FROM users_reminder WHERE ${whereClause}`;
           const deleteArgs = recipients.map(recipient => recipient.userId);
 
-          const insertStatement = 'INSERT OR REPLACE INTO users_reminder (user_id, reminder_id) VALUES (?, ?)';
+          const insertStatement = 'INSERT OR REPLACE INTO users_reminder ' +
+            '(user_id, reminder_id) VALUES (?, ?)';
 
           return db.run(deleteStatement, deleteArgs)
             .then(() => {
