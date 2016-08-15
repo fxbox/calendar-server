@@ -2,6 +2,7 @@ const spawn = require('child_process').spawn;
 const path = require('path');
 const rimraf = require('rimraf');
 const tcpPortUsed = require('tcp-port-used');
+const mkdirp = require('mkdirp');
 
 const entryPoint = path.join(__dirname, '../app.js');
 
@@ -15,8 +16,12 @@ module.exports = {
   httpPort,
   mqPort,
   profilePath,
-  start() {
+  reinitProfile() {
     rimraf.sync(profilePath);
+    mkdirp.sync(profilePath);
+  },
+  start() {
+    this.reinitProfile();
 
     handler = spawn(
       'node',

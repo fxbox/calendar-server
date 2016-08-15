@@ -4,9 +4,21 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const deferred = require('../utils/deferred');
 
+const { schema } = require('./schema');
+
 const { InternalError, NotFoundError } = require('../utils/errors');
 
 let db;
+
+function nodeToPromise(resolve, reject) {
+  return function(err, res) {
+    if (err) {
+      reject(err);
+      return;
+    }
+    resolve(res);
+  };
+}
 
 function run(...args) {
   return new Promise((resolve, reject) => {
@@ -44,29 +56,23 @@ function safeUpdateOrDelete(mode, ...args) {
 
 const promisedDb = {
   all(...args) {
-    return new Promise((resolve, reject) => {
-      db.all(...args, (err, rows) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(rows);
-      });
-    });
+    return new Promise(
+      (resolve, reject) => db.all(...args, nodeToPromise(resolve, reject))
+    );
   },
 
   run,
 
+  exec(statement) {
+    return new Promise(
+      (resolve, reject) => db.exec(statement, nodeToPromise(resolve, reject))
+    );
+  },
+
   get(...args) {
-    return new Promise((resolve, reject) => {
-      db.get(...args, (err, row) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(row);
-      });
-    });
+    return new Promise(
+      (resolve, reject) => db.get(...args, nodeToPromise(resolve, reject))
+    );
   },
 
   update(...args) {
@@ -80,31 +86,8 @@ const promisedDb = {
 
 const readyDeferred = deferred();
 
-const createStatements = [`
-  CREATE TABLE IF NOT EXISTS reminders
-  (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    family TEXT,
-    recipients TEXT,
-    action TEXT,
-    created INTEGER NOT NULL, -- in milliseconds
-    due INTEGER NOT NULL, -- in milliseconds
-    status TEXT DEFAULT 'waiting'
-  )
-`, `
-  CREATE TABLE IF NOT EXISTS subscriptions
-  (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    family TEXT,
-    title TEXT,
-    endpoint TEXT UNIQUE,
-    p256dh TEXT,
-    auth TEXT
-  )
-`];
-
-function init(profileDir) {
-  const dbPath = path.join(profileDir, 'reminders.db');
+function init(profileDir, name) {
+  const dbPath = path.join(profileDir, name || 'reminders_v2.db');
 
   // Promise chain is only used in tests. The rest of the code base uses
   // database.ready. This is due to historical reasons: we first decided to use
@@ -113,16 +96,16 @@ function init(profileDir) {
   // to change this function, and now you're reading this comment:
   // please do so :)
   return new Promise((resolve, reject) => {
+    console.info(`DB Path ${dbPath}`);
     db = new sqlite3.Database(dbPath, (err) => (err ? reject(err) : resolve()));
-  }).then(() => {
-    const promises = createStatements.map(
-      statement => promisedDb.run(statement)
-    );
-    return Promise.all(promises);
-  }).then(readyDeferred.resolve, readyDeferred.reject)
-    .catch((err) => {
+  }).then(
+    () => promisedDb.exec(schema)
+  ).then(
+    readyDeferred.resolve,
+    (err) => {
       console.error(`Error while initializing the sqlite database. \
 database.ready might not be ever resolved. Error: ${err}`);
+      readyDeferred.reject(err);
       throw err;
     });
 }
