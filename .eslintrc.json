@@ -9,8 +9,6 @@
     "es6": true
   },
   "rules": {
-    "no-undef": 2,
-    "space-before-function-paren": [2, "never"],
     "array-callback-return": 2,
     "quotes": [2, "single"],
     "no-unexpected-multiline": 2,
@@ -106,7 +104,7 @@
     "space-unary-ops": 2,
 
     // es6 stuff
-    "arrow-body-style": 2,
+    "arrow-body-style": ["warn", "as-needed"],
     "arrow-spacing": 2,
     "constructor-super": 2,
     "no-confusing-arrow": [2, { "allowParens": true }],

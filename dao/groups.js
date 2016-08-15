@@ -1,4 +1,4 @@
-const debug = require('debug')('calendar-server:reminders');
+// const debug = require('debug')('calendar-server:reminders');
 
 const database = require('./database');
 const { NotFoundError } = require('../utils/errors');
@@ -21,7 +21,7 @@ module.exports = {
           VALUES (?)
           `,
           group.name
-         )
+        )
       ))
       .then(result => result.lastId);
   },
@@ -70,12 +70,10 @@ module.exports = {
         );
       })
       .then((users) => {
-        return users.map((user) => {
-          return {
-            userId: user.user_id,
-            forename: user.forename
-          };
-        })
+        return users.map((user) => ({
+          userId: user.user_id,
+          forename: user.forename
+        }));
       });
   },
   addUserToGroup(groupId, userId) {
@@ -89,7 +87,8 @@ module.exports = {
           `,
           userId,
           groupId
-      )));
+        ))
+      );
   },
   removeUserFromGroup(groupId, userId) {
     return database.ready

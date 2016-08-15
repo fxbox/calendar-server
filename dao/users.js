@@ -1,10 +1,10 @@
-const debug = require('debug')('calendar-server:reminders');
+// const debug = require('debug')('calendar-server:reminders');
 const bcrypt = require('bcrypt');
 
 const database = require('./database');
 const { NotFoundError } = require('../utils/errors');
 const {
-  checkPropertyType, checkIsArray
+  checkPropertyType
 } = require('../utils/object_validator.js');
 
 function notFoundError(id) {
@@ -86,7 +86,7 @@ module.exports = {
               newUserObject.forename,
               email,
               password,
-              newUserObject.isHubUser ?  1 : 0
+              newUserObject.isHubUser ? 1 : 0
             );
           });
       });
@@ -183,7 +183,7 @@ module.exports = {
       })
       .then((users) => {
         if (users.length === 0) {
-          throw notFoundError(`using email as id: ${email}`);
+          throw notFoundError(`using email as id: ${name}`);
         }
 
         return {

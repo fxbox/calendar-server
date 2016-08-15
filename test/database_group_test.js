@@ -41,7 +41,8 @@ describe('dao:groups', () => {
             throw new Error('Expected group to be deleted');
           })
           .catch((e) => {
-            expect(e.message).to.equal(`The group with id \`${groupId}\` does not exist.`);
+            expect(e.message).to.equal(`The group with id \`${groupId}\` ` +
+              'does not exist.');
           });
       });
     });
@@ -68,7 +69,7 @@ describe('dao:groups', () => {
       .then((groupId) => {
         return groups.addUserToGroup(groupId, 1)
           .then(() => {
-            return groups.getAllUsersInGroup(groupId)
+            return groups.getAllUsersInGroup(groupId);
           });
       })
       .then((users) => {
@@ -79,4 +80,3 @@ describe('dao:groups', () => {
     });
   });
 });
-
