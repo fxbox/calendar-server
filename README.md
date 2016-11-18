@@ -22,6 +22,10 @@ The server is actually composed of 2 processes:
 You just need to run `npm start`. This should run both processes. Of course you
 need to run `npm i` first to install dependencies.
 
+## Data browser
+
+A text-based data browser is provided in `data/browser`. You can read more
+information from the README file in that directory.
 
 ## API login
 

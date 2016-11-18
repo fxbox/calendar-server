@@ -38,25 +38,53 @@ describe('dao/groups', () => {
 
   describe('getAllUsersInGroup(groupId)', function() {
     it('should list all users within a group', function*() {
+      /* eslint-disable camelcase */
       const users = yield groups.getAllUsersInGroup(1);
       expect(users).to.deep.equal([
-        { id: 1, forename: 'Ana' },
-        { id: 2, forename: 'Bob' },
-        { id: 3, forename: 'Sam' }
+        {
+          id: 1,
+          forename: 'Ana',
+          is_admin: 1,
+          phone_number: null,
+          username: 'email@email.com',
+        },
+        {
+          id: 2,
+          forename: 'Bob',
+          is_admin: 0,
+          phone_number: '2134567890',
+          username: 'a@email.com',
+        },
+        {
+          id: 3,
+          forename: 'Sam',
+          is_admin: 0,
+          phone_number: '+12345678901',
+          username: 'b@email.com',
+        }
       ]);
+      /* eslint-enable camelcase */
     });
   });
 
   describe('addUserToGroup(groupId, userId)', function() {
     it('should add a new user to an existing group', function*() {
+      /* eslint-disable camelcase */
       const groupId = yield groups.create({
         name: 'A'
       });
       yield groups.addUserToGroup(groupId, 1);
       const users = yield groups.getAllUsersInGroup(groupId);
       expect(users).to.deep.equal([
-        { id: 1, forename: 'Ana' }
+        {
+          id: 1,
+          forename: 'Ana',
+          is_admin: 0,
+          phone_number: null,
+          username: 'email@email.com',
+        }
       ]);
+      /* eslint-enable camelcase */
     });
   });
 });

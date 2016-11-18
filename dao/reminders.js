@@ -1,6 +1,7 @@
 const debug = require('debug')('DEBUG:calendar-server:dao/reminders');
 
 const database = require('./database');
+const { sanitizeUser } = require('./utils');
 const { InvalidInputError, NotFoundError } = require('../utils/errors');
 const {
   checkPropertyType, checkIsArray
@@ -8,15 +9,6 @@ const {
 
 function notFoundError(id) {
   return NotFoundError.createWithSubject('reminder', { name: 'id', value: id });
-}
-
-function sanitizeUser(user) {
-  if (user.phone_number) {
-    user.phoneNumber = user.phone_number;
-  }
-  delete user.password_hash;
-  delete user.phone_number;
-  return user;
 }
 
 module.exports = {

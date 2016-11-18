@@ -60,25 +60,22 @@ module.exports = {
   getAllUsersInGroup(groupId) {
     debug('getAllUsersInGroup(id=%s)', groupId);
     return database.ready
-      .then((db) => {
-        return db.all(
-          `SELECT * FROM user
-        JOIN user_group
-            on user_group.user_id = user.id
-        JOIN "group"
-            on "group".id = user_group.group_id
-        WHERE
-            "group".id = ?;
+      .then((db) =>
+        db.all(`
+          SELECT user.*, user_group.is_admin FROM user
+            JOIN user_group
+              on user_group.user_id = user.id
+            JOIN "group"
+              on "group".id = user_group.group_id
+            WHERE
+              "group".id = ?
           `,
           groupId
-        );
-      })
-      .then((users) => {
-        return users.map((user) => ({
-          id: user.user_id,
-          forename: user.forename
-        }));
-      });
+        )
+      ).then(users => users.map(user => {
+        delete user.password_hash;
+        return user;
+      }));
   },
   getCommonGroups(user1, user2) {
     debug('getCommonGroups(user1=%s, user2=%s)', user1, user2);

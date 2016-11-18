@@ -2,6 +2,7 @@ const debug = require('debug')('DEBUG:calendar-server:dao/users');
 const argon2 = require('argon2');
 
 const database = require('./database');
+const { sanitizeUser } = require('./utils');
 const { NotFoundError, UnauthorizedError } = require('../utils/errors');
 const {
   checkPropertyType
@@ -19,15 +20,6 @@ function cryptHash(plainText) {
 
 function cryptCompare(plainText, hashed) {
   return argon2.verify(hashed, plainText);
-}
-
-function sanitizeUser(user) {
-  if (user.phone_number) {
-    user.phoneNumber = user.phone_number;
-  }
-  delete user.password_hash;
-  delete user.phone_number;
-  return user;
 }
 
 module.exports = {
